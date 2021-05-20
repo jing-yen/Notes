@@ -1,0 +1,35 @@
+CREATE TABLE Note (
+    id INTEGER AS Int NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT,
+    appRevision INTEGER AS Int NOT NULL,
+    time INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    text TEXT NOT NULL,
+    spansData TEXT NOT NULL,
+    color INTEGER AS Int NOT NULL
+);
+
+insert:
+INSERT INTO Note(appRevision, time, title, text, spansData, color)
+VALUES (?, ?, ?, ?, ?, ?);
+
+update:
+REPLACE INTO Note(id, appRevision, time, title, text, spansData, color)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+select:
+SELECT * FROM Note WHERE id = ?;
+
+selectByColor:
+SELECT * FROM Note WHERE color = ?;
+
+selectAll:
+SELECT * FROM Note ORDER BY time DESC;
+
+delete:
+DELETE FROM Note WHERE id = ?;
+
+deleteAll:
+DELETE FROM Note;
+
+search:
+SELECT * FROM Note WHERE title LIKE '%'+?+'%' OR text LIKE '%'+?+'%';
