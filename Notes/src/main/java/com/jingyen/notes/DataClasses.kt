@@ -1,7 +1,13 @@
 package com.jingyen.notes
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import android.content.Context
+import androidx.lifecycle.MutableLiveData
+import com.squareup.sqldelight.android.AndroidSqliteDriver
+import com.squareup.sqldelight.runtime.coroutines.asFlow
+import com.squareup.sqldelight.runtime.coroutines.mapToList
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.datetime.Clock
 
 data class TextStyle(
@@ -16,28 +22,31 @@ data class SpanData(var spanType: Int, var start: Int, var end: Int)
 
 // Not data class
 object Backend {
-    var processing = false
-    var done = false
-    fun getAll(notesQueries: NotesQueries): List<Note> {
-        processing = false
-        done = false
-        return notesQueries.selectAll().executeAsList()
-    }
-    fun insertOrUpdate(notesQueries: NotesQueries, id: Int, title: String, text: String, spansData: String, color: Int) {
-        GlobalScope.launch {
-            processing = true
-            if (id==0)
-                notesQueries.insert(1, Clock.System.now().toEpochMilliseconds(), title, text, spansData, color)
-            else
-                notesQueries.update(id, 1, Clock.System.now().toEpochMilliseconds(), title, text, spansData, color)
-            done = true
+
+    private lateinit var androidSqlDriver: AndroidSqliteDriver
+    private lateinit var notesQueries: NotesQueries
+    private lateinit var flow: Flow<List<Note>>
+    var mutableNotes: MutableLiveData<List<Note>> = MutableLiveData()
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    fun getAll(applicationContext: Context) {
+        androidSqlDriver = AndroidSqliteDriver(schema = Database.Schema, context = applicationContext, name = "items.db")
+        notesQueries = Database(androidSqlDriver).notesQueries
+        flow =  notesQueries.selectAll().asFlow().mapToList()
+        scope.launch {
+            flow.collect { values -> mutableNotes.postValue(values) }
         }
     }
-    fun delete(notesQueries: NotesQueries, id: Int) {
-        GlobalScope.launch {
-            processing = true
-            notesQueries.delete(id)
-            done = true
+
+    fun insertOrUpdate(id: Int, title: String, text: String, spansData: String, color: Int) {
+        scope.launch {
+            if (id==0) notesQueries.insert(1, Clock.System.now().toEpochMilliseconds(), title, text, spansData, color)
+            else notesQueries.update(id, 1, Clock.System.now().toEpochMilliseconds(), title, text, spansData, color)
         }
+    }
+
+    fun delete(id: Int) {
+        scope.launch { notesQueries.delete(id) }
     }
 }

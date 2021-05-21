@@ -1,12 +1,9 @@
 package com.jingyen.notes
 
-import android.animation.LayoutTransition
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
-import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.ColorDrawable
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -24,9 +21,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.Observer
 import com.jingyen.notes.databinding.ActivityMainBinding
-import com.squareup.sqldelight.android.AndroidSqliteDriver
 import kotlinx.coroutines.*
 import kotlin.math.sqrt
 
@@ -39,10 +35,8 @@ class MainActivity : AppCompatActivity() {
     private val Int.toPx: Int
         get() = (this * Resources.getSystem().displayMetrics.density).toInt()
 
-    private lateinit var androidSqlDriver: AndroidSqliteDriver
-    private lateinit var notesQueries: NotesQueries
-    private lateinit var notes: List<Note>
     private var sortByTime = false
+    private var notes: List<Note> = emptyList()
 
     private var sensorManager: SensorManager? = null
     private val SHAKE_THRESHOLD_GRAVITY = 2.3f
@@ -56,9 +50,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        Backend.processing = true
-        Backend.done = true
-
         typeface = Typeface.createFromAsset(assets,"regular.ttf")
         typefaceBold = Typeface.createFromAsset(assets,"semibold.ttf")
 
@@ -66,7 +57,6 @@ class MainActivity : AppCompatActivity() {
         window.navigationBarColor = resources.getColor(R.color.background, this.theme)
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
         binding.search.setOnFocusChangeListener { _, b ->
@@ -86,33 +76,31 @@ class MainActivity : AppCompatActivity() {
                 binding.back.visibility = View.GONE
             }
         }
+
+        binding.search.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val sortedNotes = if (!sortByTime) notes.sortedBy { it.color } else notes
+                binding.entries.removeAllViews()
+                if (start + count > 0) sortedNotes.forEach { note -> if (note.title.contains(s!!, ignoreCase = true) || note.text.contains(s!!, ignoreCase = true)) addEntry(note) }
+                else for (note in sortedNotes) addEntry(note)
+            }
+        })
+
+        Backend.getAll(this@MainActivity)
+        binding.root.post {
+            Backend.mutableNotes.observe(this, {
+                notes = it
+                sortByTime = false
+                sort(binding.sortTime)
+            })
+        }
     }
 
     override fun onStart() {
         super.onStart()
-        if (Backend.processing)
-            if (binding.back.visibility==View.VISIBLE) stopSearch(binding.back)
-            GlobalScope.launch(Dispatchers.Main) {
-                while (!Backend.done) delay(100L)
-                withContext(Dispatchers.IO) { notes = sync() }
-                sortByTime = false
-                sort(binding.sortTime)
-
-                // Attach here to prevent runtime errors
-                binding.search.addTextChangedListener(object: TextWatcher {
-                    override fun afterTextChanged(s: Editable?) {}
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                        val sortedNotes = if (!sortByTime) notes.sortedBy { it.color } else notes
-                        binding.entries.removeAllViews()
-                        if (start+count>0) {
-                            for (note in sortedNotes) { if (note.title.contains(s!!, ignoreCase = true) || note.text.contains(s!!, ignoreCase = true)) addEntry(note) }
-                        } else {
-                            for (note in sortedNotes) addEntry(note)
-                        }
-                    }
-                })
-            }
+        if (binding.back.visibility==View.VISIBLE) stopSearch(binding.back)
     }
 
     override fun onResume() {
@@ -184,17 +172,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun showSort(v: View) {
-        if (binding.sortButtons.visibility==View.INVISIBLE) {
+        if (binding.sortButtons.visibility == View.INVISIBLE) {
             binding.sortButtons.visibility = View.VISIBLE
             binding.entries.animate()
                 .translationY(0f)
                 .duration = 100
         }
         else {
-            binding.sortButtons.visibility = View.INVISIBLE
             binding.entries.animate()
                 .translationY(-binding.sortButtons.height.toFloat())
-                .duration = 100
+                .setDuration(100)
+                .withEndAction { binding.sortButtons.visibility = View.INVISIBLE }
         }
     }
 
@@ -204,12 +192,6 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun sync(): List<Note> {
-        androidSqlDriver = AndroidSqliteDriver(schema = Database.Schema, context = applicationContext, name = "items.db")
-        notesQueries = Database(androidSqlDriver).notesQueries
-        return Backend.getAll(notesQueries)
-    }
-
     override fun onBackPressed() {
         if (binding.back.visibility==View.VISIBLE) {
             stopSearch(binding.back)
@@ -217,7 +199,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        sensorManager?.unregisterListener(sensorListener);
+        sensorManager?.unregisterListener(sensorListener)
         super.onPause()
     }
 

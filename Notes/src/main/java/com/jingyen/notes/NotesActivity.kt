@@ -273,9 +273,9 @@ class NotesActivity : AppCompatActivity() {
                 }
                 if (classType!=0) spansData.add(SpanData(classType, spannable.getSpanStart(span), spannable.getSpanEnd(span)))
             }
-            Backend.insertOrUpdate(notesQueries, id, title, text, Json.encodeToString(spansData), color)
+            Backend.insertOrUpdate(id, title, text, Json.encodeToString(spansData), color)
         } else if (id!=0) {
-            Backend.delete(notesQueries, id)
+            Backend.delete(id)
         }
     }
 }
