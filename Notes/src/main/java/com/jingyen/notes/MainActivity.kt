@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.jingyen.notes.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import kotlin.math.sqrt
 
 class MainActivity : AppCompatActivity() {
@@ -90,11 +91,13 @@ class MainActivity : AppCompatActivity() {
 
         Backend.getAll(this@MainActivity)
         binding.root.post {
-            Backend.mutableNotes.observe(this, {
-                notes = it
-                sortByTime = false
-                sort(binding.sortTime)
-            })
+            CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
+                Backend.mutableNotes.collect { mutableNotesValue ->
+                    notes = mutableNotesValue
+                    sortByTime = false
+                    sort(binding.sortTime)
+                }
+            }
         }
     }
 
