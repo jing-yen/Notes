@@ -21,7 +21,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import com.jingyen.notes.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -36,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     private val Int.toPx: Int
         get() = (this * Resources.getSystem().displayMetrics.density).toInt()
 
-    private var sortByTime = false
+    private var sortBy = 0
     private var notes: List<Note> = emptyList()
 
     private var sensorManager: SensorManager? = null
@@ -82,9 +81,9 @@ class MainActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val sortedNotes = if (!sortByTime) notes.sortedBy { it.color } else notes
+                val sortedNotes = when (sortBy) { 0 -> notes; 1 -> notes.sortedByDescending { it.createdTime }; else -> notes.sortedBy { it.color } }
                 binding.entries.removeAllViews()
-                if (start + count > 0) sortedNotes.forEach { note -> if (note.title.contains(s!!, ignoreCase = true) || note.text.contains(s!!, ignoreCase = true)) addEntry(note) }
+                if (start + count > 0) sortedNotes.forEach { note -> if (note.title.contains(s!!, ignoreCase = true) || note.text.contains(s, ignoreCase = true)) addEntry(note) }
                 else for (note in sortedNotes) addEntry(note)
             }
         })
@@ -94,8 +93,7 @@ class MainActivity : AppCompatActivity() {
             CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
                 Backend.mutableNotes.collect { mutableNotesValue ->
                     notes = mutableNotesValue
-                    sortByTime = false
-                    sort(binding.sortTime)
+                    sort(when (sortBy) { 0 -> binding.sortModifiedTime; 1 -> binding.sortCreatedTime; else -> binding.sortColor})
                 }
             }
         }
@@ -160,18 +158,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun sort(v: View) {
-        if ((v==binding.sortTime&&!sortByTime)||(v==binding.sortColor&&sortByTime)) {
-            binding.entries.removeAllViews()
-            sortByTime = if (v == binding.sortTime) { for (note in notes) addEntry(note); true }
-            else { val sortedNotes = notes.sortedBy { it.color }; for (note in sortedNotes) addEntry(note); false }
-            binding.sortTime.background = if (sortByTime) resources.getDrawable(R.drawable.sortbar, this.theme) else null
-            binding.sortColor.background = if (!sortByTime) resources.getDrawable(R.drawable.sortbar, this.theme) else null
-        }
+        binding.entries.removeAllViews()
+        sortBy = when (v) { binding.sortModifiedTime -> 0; binding.sortCreatedTime -> 1; else -> 2 }
+        val sortedNotes = when (sortBy) { 0 -> notes; 1 -> notes.sortedByDescending { it.createdTime }; else -> notes.sortedBy { it.color } }
+        for (note in sortedNotes) addEntry(note)
+        binding.sortModifiedTime.background = null
+        binding.sortCreatedTime.background = null
+        binding.sortColor.background = null
+        v.background = resources.getDrawable(R.drawable.sortbar, this.theme)
+
         binding.sortButtons.visibility = View.INVISIBLE
         binding.entries.animate()
             .translationY(-binding.sortButtons.height.toFloat())
             .duration = 100
-        binding.sortText.text = "Sort by: ${if (sortByTime) "Time" else "Colour"}"
+        binding.sortText.text = "Sort by ${when (sortBy) { 0 -> "modified time"; 1 -> "created time"; else -> "colour" }}"
     }
 
     fun showSort(v: View) {

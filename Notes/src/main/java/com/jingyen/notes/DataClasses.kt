@@ -1,12 +1,10 @@
 package com.jingyen.notes
 
 import android.content.Context
-import androidx.lifecycle.MutableLiveData
 import com.squareup.sqldelight.android.AndroidSqliteDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.datetime.Clock
@@ -38,11 +36,11 @@ object Backend {
         }
     }
 
-    fun insertOrUpdate(id: Int, title: String, text: String, spansData: String, color: Int) {
+    fun insertOrUpdate(id: Int, createdTime: Long, title: String, text: String, spansData: String, color: Int) {
         scope.launch {
             withContext(NonCancellable) {
-                if (id==0) notesQueries.insert(1, Clock.System.now().toEpochMilliseconds(), title, text, spansData, color)
-                else notesQueries.update(id, 1, Clock.System.now().toEpochMilliseconds(), title, text, spansData, color)
+                if (id==0) notesQueries.insert(1, Clock.System.now().toEpochMilliseconds(), Clock.System.now().toEpochMilliseconds(), title, text, spansData, color)
+                else notesQueries.update(id, 1, Clock.System.now().toEpochMilliseconds(), createdTime, title, text, spansData, color)
             }
         }
     }

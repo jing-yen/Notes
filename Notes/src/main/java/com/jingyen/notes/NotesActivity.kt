@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -273,7 +274,7 @@ class NotesActivity : AppCompatActivity() {
                 }
                 if (classType!=0) spansData.add(SpanData(classType, spannable.getSpanStart(span), spannable.getSpanEnd(span)))
             }
-            Backend.insertOrUpdate(id, title, text, Json.encodeToString(spansData), color)
+            Backend.insertOrUpdate(id, note?.createdTime ?: Clock.System.now().toEpochMilliseconds(), title, text, Json.encodeToString(spansData), color)
         } else if (id!=0) {
             Backend.delete(id)
         }
