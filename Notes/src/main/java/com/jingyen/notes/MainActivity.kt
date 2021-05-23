@@ -18,9 +18,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
 import com.jingyen.notes.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -118,13 +118,14 @@ class MainActivity : AppCompatActivity() {
             5 ->  R.color.purplePreview
             else ->  R.color.greyPreview }
 
-        val title = TextView(this)
+        val title = AppCompatTextView(this)
         title.text = note.title
         title.typeface = typefaceBold
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
         title.setTextColor(resources.getColor(R.color.text, this.theme))
 
-        val text = TextView(this)
+        val text = AppCompatTextView(this)
+        text.isEmojiCompatEnabled = true
         text.text = note.text
         text.typeface = typeface
         text.maxLines = 10
@@ -171,7 +172,7 @@ class MainActivity : AppCompatActivity() {
         binding.entries.animate()
             .translationY(-binding.sortButtons.height.toFloat())
             .duration = 100
-        binding.sortText.text = "Sort by ${when (sortBy) { 0 -> "modified time"; 1 -> "created time"; else -> "colour" }}"
+        binding.sortText.text = "Sort by: ${when (sortBy) { 0 -> "Modified Time"; 1 -> "Created Time"; else -> "Colour" }}"
     }
 
     fun showSort(v: View) {

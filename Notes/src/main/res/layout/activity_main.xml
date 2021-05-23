@@ -172,8 +172,20 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
                             android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/imageView2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:scaleX="0.8"
+                                android:scaleY="0.8"
+                                app:srcCompat="@drawable/sort" />
 
                             <TextView
                                 android:id="@+id/sortText"
@@ -183,19 +195,10 @@
                                 android:fontFamily="@font/regular"
                                 android:paddingTop="4dp"
                                 android:paddingBottom="4dp"
-                                android:text="Sort by modified time"
+                                android:text="Sort by: Modified Time"
                                 android:textColor="@color/lightText"
-                                android:textSize="13sp"
+                                android:textSize="14sp"
                                 tools:ignore="TouchTargetSizeCheck" />
-
-                            <ImageView
-                                android:id="@+id/imageView2"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:scaleX="0.8"
-                                android:scaleY="0.8"
-                                app:srcCompat="@drawable/dropdown" />
 
                         </LinearLayout>
 

@@ -260,7 +260,7 @@ class NotesActivity : AppCompatActivity() {
         //Save
         val title = binding.title.text.toString()
         val text = binding.text.text.toString()
-        if (binding.title.text.isNotBlank() || binding.text.text!!.isNotBlank()) {
+        if (binding.title.text!!.isNotBlank() || binding.text.text!!.isNotBlank()) {
             val spannable = binding.text.text as Spannable
             val styleSpans = spannable.getSpans(0, binding.text.text!!.length, ParcelableSpan::class.java)
             val spansData = mutableListOf<SpanData>()

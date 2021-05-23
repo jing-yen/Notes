@@ -3,10 +3,10 @@ package com.jingyen.notes
 import android.app.Activity
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.KeyEvent
+import androidx.appcompat.widget.AppCompatEditText
 
-class SuperEditText : androidx.appcompat.widget.AppCompatEditText {
+class SuperEditText : AppCompatEditText {
     var activity: Activity? = null
     var notesActivity: NotesActivity? = null
     private var textChanged = false
