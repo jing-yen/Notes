@@ -10,19 +10,23 @@ class SuperEditText : AppCompatEditText {
     var activity: Activity? = null
     var notesActivity: NotesActivity? = null
     private var textChanged = false
+    private var textIncreased = false
 
     constructor(context: Context?) : super(context!!) {}
     constructor(context: Context?, attrs: AttributeSet?) : super(context!!, attrs) {}
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context!!, attrs, defStyleAttr) {}
 
     override fun onTextChanged(text: CharSequence?, start: Int, lengthBefore: Int, lengthAfter: Int) {
-        if (lengthAfter>lengthBefore) textChanged = true
+        textChanged = true
+        if (lengthAfter>lengthBefore) textIncreased = true
         super.onTextChanged(text, start, lengthBefore, lengthAfter)
     }
 
     override fun onSelectionChanged(selStart: Int, selEnd: Int) {
-        if (!textChanged) notesActivity?.checkStyle(selStart, selEnd)
+        if (!textChanged) notesActivity?.checkSelection(selStart, selEnd)
+        if (!textIncreased) notesActivity?.checkStyle(selStart, selEnd)
         textChanged = false
+        textIncreased = false
         super.onSelectionChanged(selStart, selEnd)
     }
 

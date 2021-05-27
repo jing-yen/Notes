@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.*
 import android.text.style.StrikethroughSpan
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
@@ -91,7 +92,7 @@ class NotesActivity : AppCompatActivity() {
                     applyStyle(s, start + before, start + count, 2, textstyle.italic)
                     applyStyle(s, start + before, start + count, 3, textstyle.underline)
                     applyStyle(s, start + before, start + count, 4, textstyle.strikethrough)
-                    if (s[start+before] =='\n') applyStyle(s, start + count, start + count, 5, textstyle.list)
+                    if (s[start+count-1]!='\ufeff' && textstyle.list) applyStyle(s, start + count, start + count, 5, textstyle.list)
                 }
             }
         })
@@ -130,10 +131,13 @@ class NotesActivity : AppCompatActivity() {
         if (styleBool) {
             var newStart = start
             var newEnd = end
+            var selStart = start
+            var selEnd = end
             if (styleType==5) {
                 while (newStart > 0) if (spannable[--newStart]=='\n') {newStart++; break}
-                binding.text.text!!.insert(newStart, "\u200b")
-                while (newEnd < spannable.length - 1) if (spannable[++newEnd]=='\n') break
+                if (newStart<spannable.length) { if (spannable[newStart]!='\ufeff') { binding.text.text!!.insert(newStart, "\ufeff"); newEnd++; selStart++; selEnd++ } }
+                else { binding.text.text!!.insert(newStart, "\ufeff"); newEnd++; selStart++; selEnd++ }
+                while (newEnd < spannable.length-1) if (spannable[++newEnd]=='\n') break
                 val existingListSpan = spannable.getSpans(newStart, newEnd, ListSpan::class.java)
                 for (listSpan in existingListSpan) spannable.removeSpan(listSpan)
             } else {
@@ -153,7 +157,7 @@ class NotesActivity : AppCompatActivity() {
                 }
             }
             spannable.setSpan(styleClass, newStart, newEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            if (styleType == 5) binding.text.setSelection(start+1, end+1)
+            if (styleType == 5) binding.text.setSelection(selStart, selEnd)
         } else {
             val styleSpans = spannable.getSpans(start, end, styleClass::class.java)
             for (styleSpan in styleSpans) {
@@ -163,6 +167,8 @@ class NotesActivity : AppCompatActivity() {
                 if (styleClass !is ListSpan) {
                     if (spanStart < start) spannable.setSpan(styleClass, spanStart, start, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                     if (spanEnd > end) spannable.setSpan(styleClass, end, spanEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                } else {
+                    if (spannable[spanStart]=='\ufeff') binding.text.text!!.delete(spanStart, spanStart+1)
                 }
             }
         }
@@ -192,6 +198,12 @@ class NotesActivity : AppCompatActivity() {
         binding.underline.setBackgroundColor(if (textstyle.underline) Color.parseColor("#19000000") else Color.TRANSPARENT)
         binding.strikethrough.setBackgroundColor(if (textstyle.strikethrough) Color.parseColor("#19000000") else Color.TRANSPARENT)
         binding.bullet.setBackgroundColor(if (textstyle.list) Color.parseColor("#19000000") else Color.TRANSPARENT)
+    }
+
+    fun checkSelection(start: Int, end: Int) {
+        if (start or end < binding.text.length()) {
+            if (start==end)  if(binding.text.text!![start]=='\ufeff') binding.text.setSelection(start+1); Log.e("whatt", "fuck")
+        }
     }
 
     fun blank(v: View) {
