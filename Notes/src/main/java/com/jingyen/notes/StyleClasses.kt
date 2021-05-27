@@ -21,8 +21,8 @@ class ListSpan(private val leadWidth: Int, private val gapWidth: Int) : LeadingM
         if (first) {
             val orgStyle: Paint.Style = p.style
             p.style = Paint.Style.FILL
-            val width: Float = p.measureText("\u2022 ")
-            c.drawText("\u2022 ", (leadWidth + x - width / 2) * dir, baseline.toFloat(), p)
+            val width: Float = p.measureText("\u200A\u2022 ")
+            c.drawText("\u200A\u2022 ", (leadWidth + x - width / 2) * dir, baseline.toFloat(), p)
             p.style = orgStyle
         }
     }
