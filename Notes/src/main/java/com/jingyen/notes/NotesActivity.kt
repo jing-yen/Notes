@@ -60,7 +60,7 @@ class NotesActivity : AppCompatActivity() {
                         2 -> ItalicSpan()
                         3 -> RealUnderlineSpan()
                         4 -> StrikethroughSpan()
-                        else -> ListSpan(15, 15)
+                        else -> ListSpan(15, 25)
                     }
                     spannable.setSpan(classType, span.start, span.end, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
                 }
@@ -85,7 +85,7 @@ class NotesActivity : AppCompatActivity() {
         binding.text.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                string = if (s!=null) s.toString() else ""
+                string = s?.toString() ?: ""
             }
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (binding.body.translationY!=0f) pickColor(binding.pickcolor)
@@ -282,7 +282,7 @@ class NotesActivity : AppCompatActivity() {
         val text = binding.text.text.toString()
         if (binding.title.text!!.isNotBlank() || binding.text.text!!.isNotBlank()) {
             val spannable = binding.text.text as Spannable
-            val styleSpans = spannable.getSpans(0, binding.text.text!!.length, ParcelableSpan::class.java)
+            val styleSpans = spannable.getSpans(0, binding.text.text!!.length, Any::class.java)
             val spansData = mutableListOf<SpanData>()
             for (span in styleSpans) {
                 val classType = when (span) {
@@ -290,6 +290,7 @@ class NotesActivity : AppCompatActivity() {
                     is ItalicSpan -> 2
                     is RealUnderlineSpan -> 3
                     is StrikethroughSpan -> 4
+                    is ListSpan -> 5
                     else -> 0
                 }
                 if (classType!=0) spansData.add(SpanData(classType, spannable.getSpanStart(span), spannable.getSpanEnd(span)))
