@@ -8,6 +8,7 @@ import android.text.style.StrikethroughSpan
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.jingyen.notes.databinding.ActivityNotesBinding
 import com.squareup.sqldelight.android.AndroidSqliteDriver
@@ -28,6 +29,8 @@ class NotesActivity : AppCompatActivity() {
     private lateinit var notesQueries: NotesQueries
     private var note: Note? = null
     private var id = 0
+
+    private lateinit var string: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,7 +84,9 @@ class NotesActivity : AppCompatActivity() {
         })
         binding.text.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                string = if (s!=null) s.toString() else ""
+            }
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (binding.body.translationY!=0f) pickColor(binding.pickcolor)
                 if (start+count>start+before) {
@@ -90,6 +95,12 @@ class NotesActivity : AppCompatActivity() {
                     applyStyle(s, start + before, start + count, 3, textstyle.underline)
                     applyStyle(s, start + before, start + count, 4, textstyle.strikethrough)
                     if (s[start+count-1]!='\ufeff' && textstyle.list) applyStyle(s, start + count, start + count, 5, textstyle.list)
+                } else if (start+before>start+count) {
+                    for (i in s!!.indices) {
+                        if (s[i] !=string[i]) {
+                            if (string[i]=='\ufeff') applyStyle(s as Spannable, i, i+1, 5, false)
+                        }
+                    }
                 }
             }
         })
@@ -199,7 +210,7 @@ class NotesActivity : AppCompatActivity() {
 
     fun checkSelection(start: Int, end: Int) {
         if (start or end < binding.text.length()) {
-            if (start==end)  if(binding.text.text!![start]=='\ufeff') binding.text.setSelection(start+1); Log.e("whatt", "fuck")
+            if (start==end)  if(binding.text.text!![start]=='\ufeff') binding.text.setSelection(start+1)
         }
     }
 
