@@ -11,10 +11,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import com.jingyen.notes.databinding.ActivityNotesBinding
 import com.squareup.sqldelight.android.AndroidSqliteDriver
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -39,7 +36,7 @@ class NotesActivity : AppCompatActivity() {
 
         androidSqlDriver = AndroidSqliteDriver(schema = Database.Schema, context = applicationContext, name = "items.db")
 
-        GlobalScope.launch(Dispatchers.Main) {
+        CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
             withContext(Dispatchers.IO) {
                 notesQueries = Database(androidSqlDriver).notesQueries
                 if (intent.extras!=null) {
@@ -137,7 +134,7 @@ class NotesActivity : AppCompatActivity() {
                 while (newStart > 0) if (spannable[--newStart]=='\n') {newStart++; break}
                 if (newStart<spannable.length) { if (spannable[newStart]!='\ufeff') { binding.text.text!!.insert(newStart, "\ufeff"); newEnd++; selStart++; selEnd++ } }
                 else { binding.text.text!!.insert(newStart, "\ufeff"); newEnd++; selStart++; selEnd++ }
-                while (newEnd < spannable.length-1) if (spannable[++newEnd]=='\n') break
+                while (newEnd < spannable.length-1) { if (spannable[newEnd]=='\n') break; newEnd++ }
                 val existingListSpan = spannable.getSpans(newStart, newEnd, ListSpan::class.java)
                 for (listSpan in existingListSpan) spannable.removeSpan(listSpan)
             } else {
