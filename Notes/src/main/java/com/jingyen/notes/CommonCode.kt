@@ -19,9 +19,7 @@ data class TextStyle(
 @kotlinx.serialization.Serializable
 data class SpanData(var spanType: Int, var start: Int, var end: Int)
 
-// Not data class
 object Backend {
-
     private lateinit var androidSqlDriver: AndroidSqliteDriver
     private lateinit var notesQueries: NotesQueries
     var mutableNotes = MutableStateFlow<List<Note>>(emptyList())
@@ -36,13 +34,20 @@ object Backend {
         }
     }
 
-    fun insertOrUpdate(id: Int, createdTime: Long, title: String, text: String, spansData: String, color: Int) {
+    fun get(id: Int): Note {
+        return notesQueries.select(id).executeAsOne()
+    }
+
+    fun insert(id: Int, createdTime: Long, title: String, text: String, spansData: String, color: Int) {
         scope.launch {
             withContext(NonCancellable) {
-                if (id==0) notesQueries.insert(1, Clock.System.now().toEpochMilliseconds(), Clock.System.now().toEpochMilliseconds(), title, text, spansData, color)
-                else notesQueries.update(id, 1, Clock.System.now().toEpochMilliseconds(), createdTime, title, text, spansData, color)
+                notesQueries.insert(id, 1, Clock.System.now().toEpochMilliseconds(), createdTime, title, text, spansData, color)
             }
         }
+    }
+
+    fun highestId(): Int {
+        return try { notesQueries.highestId().executeAsOne()+1 ?: 1 } catch (ex: NullPointerException) { 1 }
     }
 
     fun delete(id: Int) {

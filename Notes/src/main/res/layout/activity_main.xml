@@ -31,6 +31,7 @@
                 android:id="@+id/avd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="TODO"
                 android:onClick="newEntry"
                 android:paddingStart="16dp"
                 android:paddingTop="16dp"
@@ -40,7 +41,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/add"
-                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck,DuplicateSpeakableTextCheck" />
 
             <ImageView
                 android:id="@+id/pickcolor"
@@ -51,7 +52,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/open" />
+                app:srcCompat="@drawable/open"
+                android:contentDescription="TODO" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -99,9 +101,8 @@
                         android:fontFamily="@font/semibold"
                         android:gravity="start|top"
                         android:hint="Untitled"
-                        android:inputType="textMultiLine"
                         android:minHeight="0dp"
-                        android:text="Quick Notes"
+                        android:text="@string/app_title"
                         android:textColor="@color/text"
                         android:textSize="30sp"
                         tools:ignore="TouchTargetSizeCheck" />
@@ -132,7 +133,8 @@
                                 android:visibility="gone"
                                 app:srcCompat="@drawable/back"
                                 tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck"
-                                tools:visibility="visible" />
+                                tools:visibility="visible"
+                                android:contentDescription="TODO" />
                         </LinearLayout>
 
                         <com.jingyen.notes.SuperEditText
@@ -144,7 +146,7 @@
                             android:background="@drawable/searchbar"
                             android:ems="10"
                             android:fontFamily="@font/regular"
-                            android:hint="Search ..."
+                            android:hint="@string/search"
                             android:inputType="textPersonName"
                             android:paddingStart="16dp"
                             android:paddingTop="10dp"
@@ -185,7 +187,8 @@
                                 android:layout_marginEnd="8dp"
                                 android:scaleX="0.8"
                                 android:scaleY="0.8"
-                                app:srcCompat="@drawable/sort" />
+                                app:srcCompat="@drawable/sort"
+                                android:contentDescription="TODO" />
 
                             <TextView
                                 android:id="@+id/sortText"

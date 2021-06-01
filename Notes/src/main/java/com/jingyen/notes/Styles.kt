@@ -13,8 +13,11 @@ import androidx.emoji2.text.EmojiCompat
 import androidx.emoji2.text.FontRequestEmojiCompatConfig
 
 class BoldSpan: StyleSpan(1)
+
 class ItalicSpan: StyleSpan(2)
+
 class RealUnderlineSpan: UnderlineSpan()
+
 class ListSpan(private val leadWidth: Int, private val gapWidth: Int) : LeadingMarginSpan {
     override fun getLeadingMargin(first: Boolean): Int { return leadWidth + gapWidth }
     override fun drawLeadingMargin(c: Canvas, p: Paint, x: Int, dir: Int, top: Int, baseline: Int, bottom: Int, text: CharSequence?, start: Int, end: Int, first: Boolean, l: Layout?) {

@@ -3,15 +3,15 @@ package com.jingyen.notes
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.text.*
+import android.text.Editable
+import android.text.Spannable
+import android.text.TextWatcher
 import android.text.style.StrikethroughSpan
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
 import com.jingyen.notes.databinding.ActivityNotesBinding
-import com.squareup.sqldelight.android.AndroidSqliteDriver
 import kotlinx.coroutines.*
 import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
@@ -21,86 +21,77 @@ import kotlinx.serialization.json.Json
 class NotesActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNotesBinding
     private lateinit var imm: InputMethodManager
-    private var showKeyboard = true
-    private var color = 2
-    private var textstyle = TextStyle(bold = false, italic = false, underline = false, strikethrough = false, list = false)
-
-    private lateinit var androidSqlDriver: AndroidSqliteDriver
-    private lateinit var notesQueries: NotesQueries
-    private var note: Note? = null
+    private var showKeyboard = false
     private var id = 0
-
-    private lateinit var string: String
+    private var note = Note(0, 1, Clock.System.now().toEpochMilliseconds(), Clock.System.now().toEpochMilliseconds(), "", "", Json.encodeToString(emptyList<SpanData>()), 1)
+    private var color = MutableLiveData(1)
+    var textstyle = MutableLiveData(TextStyle(bold = false, italic = false, underline = false, strikethrough = false, list = false))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNotesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        androidSqlDriver = AndroidSqliteDriver(schema = Database.Schema, context = applicationContext, name = "items.db")
-
-        CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
-            withContext(Dispatchers.IO) {
-                notesQueries = Database(androidSqlDriver).notesQueries
-                if (intent.extras!=null) {
-                    id = intent.extras!!.getInt("id", 0)
-                    if (id!=0) note = notesQueries.select(id).executeAsOne()
-                }
-            }
-            if (note!=null) {
-                binding.title.setText(note!!.title)
-                binding.text.setText(note!!.text)
-                color = note!!.color
-                setColor(binding.color) //for speed!!
-                val spannable = binding.text.text as Spannable
-                val spansData = Json.decodeFromString<List<SpanData>>(note!!.spansData)
-                for (span in spansData) {
-                    val classType: Any = when (span.spanType) {
-                        1 -> BoldSpan()
-                        2 -> ItalicSpan()
-                        3 -> RealUnderlineSpan()
-                        4 -> StrikethroughSpan()
-                        else -> ListSpan(15, 25)
-                    }
-                    spannable.setSpan(classType, span.start, span.end, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
-                }
-                blank(binding.blank)
-            } else setColor(binding.color)
+        imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        id = intent.getIntExtra("id", 0)
+        if (id!=0) { CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
+            note = withContext(Dispatchers.IO) { Backend.get(id) }
+            color.value = note.color
+            binding.title.setText(note.title)
+            binding.text.setText(note.text)
+            Json.decodeFromString<List<SpanData>>(note.spansData).forEach { span ->
+                (binding.text.text as Spannable).setSpan(when (span.spanType) {
+                    1 -> BoldSpan(); 2 -> ItalicSpan(); 3 -> RealUnderlineSpan(); 4 -> StrikethroughSpan(); else -> ListSpan(15, 25) },
+                    span.start, span.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE) }
+        } } else {
+            showKeyboard = true
+            id = Backend.highestId()
         }
 
-        imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-
-        binding.text.activity = this
         binding.text.notesActivity = this
-        binding.root.post { binding.color.layoutParams.height = binding.red.width }
-
+        binding.root.post {
+            binding.color.layoutParams.height = binding.red.width
+            binding.pickcolor.setOnClickListener { binding.body.animate().translationY(if (binding.body.translationY==0f) binding.color.height.toFloat() else 0f).duration = 150 }
+            binding.showime.setOnClickListener { binding.imebar.visibility = View.VISIBLE; binding.showime.visibility = View.GONE }
+            binding.hideime.setOnClickListener { binding.imebar.visibility = View.GONE; binding.showime.visibility = View.VISIBLE }
+            binding.blank.setOnClickListener {
+                binding.text.requestFocus()
+                binding.text.setSelection(binding.text.text!!.length)
+                imm.showSoftInput(binding.text, InputMethodManager.SHOW_IMPLICIT) }
+            textstyle.observe(this, { value ->
+                binding.bold.setBackgroundColor(if (value.bold) Color.parseColor("#19000000") else Color.TRANSPARENT)
+                binding.italic.setBackgroundColor(if (value.italic) Color.parseColor("#19000000") else Color.TRANSPARENT)
+                binding.underline.setBackgroundColor(if (value.underline) Color.parseColor("#19000000") else Color.TRANSPARENT)
+                binding.strikethrough.setBackgroundColor(if (value.strikethrough) Color.parseColor("#19000000") else Color.TRANSPARENT)
+                binding.bullet.setBackgroundColor(if (value.list) Color.parseColor("#19000000") else Color.TRANSPARENT) })
+            color.observe(this, { value ->
+                val colorCode = when (value) {
+                    0 -> Pair(R.color.redBackground, R.color.redBackgroundDark)
+                    1 -> Pair(R.color.yellowBackground, R.color.yellowBackgroundDark)
+                    2 -> Pair(R.color.greenBackground, R.color.greenBackgroundDark)
+                    3 ->  Pair(R.color.blueBackground, R.color.blueBackgroundDark)
+                    4 ->  Pair(R.color.purpleBackground, R.color.purpleBackgroundDark)
+                    else ->  Pair(R.color.greyBackground, R.color.greyBackgroundDark) }
+                binding.mainplus.setBackgroundColor(resources.getColor(colorCode.second, this.theme))
+                binding.parent.setBackgroundColor(resources.getColor(colorCode.first, this.theme))
+                binding.main.setBackgroundColor(resources.getColor(colorCode.first, this.theme))
+                binding.body.setBackgroundColor(resources.getColor(colorCode.first, this.theme))
+                window.navigationBarColor = resources.getColor(colorCode.first, this.theme) })
+        }
         binding.text.onFocusChangeListener = View.OnFocusChangeListener { _, b -> binding.imebar.visibility = if (b) View.VISIBLE else View.GONE; if (!b) binding.showime.visibility = View.GONE }
-        binding.title.addTextChangedListener(object: TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        binding.title.addTextChangedListener(CustomTextWatcher())
+        binding.text.addTextChangedListener(object: CustomTextWatcher() {
+            private lateinit var string: String
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { string = s?.toString() ?: "" }
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (binding.body.translationY!=0f) pickColor(binding.pickcolor)
-            }
-        })
-        binding.text.addTextChangedListener(object: TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                string = s?.toString() ?: ""
-            }
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (binding.body.translationY!=0f) pickColor(binding.pickcolor)
                 if (start+count>start+before) {
-                    applyStyle((s as Spannable), start + before, start + count, 1, textstyle.bold)
-                    applyStyle(s, start + before, start + count, 2, textstyle.italic)
-                    applyStyle(s, start + before, start + count, 3, textstyle.underline)
-                    applyStyle(s, start + before, start + count, 4, textstyle.strikethrough)
-                    if (s[start+count-1]!='\ufeff' && textstyle.list) applyStyle(s, start + count, start + count, 5, textstyle.list)
+                    Spans().apply(s as Editable, start+before, start+count, 1, textstyle.value!!.bold)
+                    Spans().apply(s, start+before, start+count, 2, textstyle.value!!.italic)
+                    Spans().apply(s, start+before, start+count, 3, textstyle.value!!.underline)
+                    Spans().apply(s, start+before, start+count, 4, textstyle.value!!.strikethrough)
+                    if (s[start+count-1]!='\ufeff' && textstyle.value!!.list) Spans().apply(s, start+count, start+count, 5, textstyle.value!!.list)
                 } else if (start+before>start+count) {
-                    for (i in s!!.indices) {
-                        if (s[i] !=string[i]) {
-                            if (string[i]=='\ufeff') applyStyle(s as Spannable, i, i+1, 5, false)
-                        }
-                    }
+                    for (i in s!!.indices) { if (s[i]!=string[i] && string[i]=='\ufeff') Spans().apply(s as Editable, i, i+1, 5, false) }
                 }
             }
         })
@@ -108,154 +99,31 @@ class NotesActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (showKeyboard) blank(binding.blank)
+        if (showKeyboard) binding.root.post { binding.blank.performClick() }
     }
 
     fun stylize(v: View) {
-        val (styleType, styleBool) = when (v) {
-            binding.bold -> { textstyle.bold = !textstyle.bold; Pair(1, textstyle.bold) }
-            binding.italic -> { textstyle.italic = !textstyle.italic; Pair(2, textstyle.italic) }
-            binding.underline -> { textstyle.underline = !textstyle.underline; Pair(3, textstyle.underline) }
-            binding.strikethrough -> { textstyle.strikethrough = !textstyle.strikethrough; Pair(4, textstyle.strikethrough) }
-            else -> { textstyle.list = !textstyle.list; Pair(5, textstyle.list) }
-        }
-        v.setBackgroundColor(if (styleBool) Color.parseColor("#19000000") else Color.TRANSPARENT)
-        if (binding.text.hasSelection() || styleType==5) {
-            val start = binding.text.selectionStart
-            val end = binding.text.selectionEnd
-            val spannable = binding.text.text as Spannable
-            applyStyle(spannable, start, end, styleType, styleBool)
-        }
-    }
-
-    private fun applyStyle(spannable: Spannable, start: Int, end: Int, styleType: Int, styleBool: Boolean) {
-        val styleClass: Any = when (styleType) {
-            1 -> BoldSpan()
-            2 -> ItalicSpan()
-            3 -> RealUnderlineSpan()
-            4 -> StrikethroughSpan()
-            else -> ListSpan(15, 25)
-        }
-        if (styleBool) {
-            var newStart = start
-            var newEnd = end
-            var selStart = start
-            var selEnd = end
-            if (styleType==5) {
-                while (newStart > 0) if (spannable[--newStart]=='\n') {newStart++; break}
-                if (newStart<spannable.length) { if (spannable[newStart]!='\ufeff') { binding.text.text!!.insert(newStart, "\ufeff"); newEnd++; selStart++; selEnd++ } }
-                else { binding.text.text!!.insert(newStart, "\ufeff"); newEnd++; selStart++; selEnd++ }
-                while (newEnd < spannable.length-1) { if (spannable[newEnd]=='\n') break; newEnd++ }
-                val existingListSpan = spannable.getSpans(newStart, newEnd, ListSpan::class.java)
-                for (listSpan in existingListSpan) spannable.removeSpan(listSpan)
-            } else {
-                if (start > 0) {
-                    val frontStyle = spannable.getSpans(start - 1, start, styleClass::class.java)
-                    for (style in frontStyle) {
-                        newStart = spannable.getSpanStart(style)
-                        spannable.removeSpan(style)
-                    }
-                }
-                if (end < spannable.length - 1) {
-                    val backStyle = spannable.getSpans(end, end + 1, styleClass::class.java)
-                    for (style in backStyle) {
-                        newEnd = spannable.getSpanEnd(style)
-                        spannable.removeSpan(style)
-                    }
-                }
-            }
-            spannable.setSpan(styleClass, newStart, newEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            if (styleType == 5) binding.text.setSelection(selStart, selEnd)
-        } else {
-            val styleSpans = spannable.getSpans(start, end, styleClass::class.java)
-            for (styleSpan in styleSpans) {
-                val spanStart = spannable.getSpanStart(styleSpan)
-                val spanEnd = spannable.getSpanEnd(styleSpan)
-                spannable.removeSpan(styleSpan)
-                if (styleClass !is ListSpan) {
-                    if (spanStart < start) spannable.setSpan(styleClass, spanStart, start, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    if (spanEnd > end) spannable.setSpan(styleClass, end, spanEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                } else {
-                    if (spannable[spanStart]=='\ufeff') binding.text.text!!.delete(spanStart, spanStart+1)
-                }
-            }
-        }
-    }
-
-    fun checkStyle(start: Int, end: Int) {
-        val spannable = binding.text.text as Spannable
-        val allSpans: Array<Any> = spannable.getSpans(start, end, Any::class.java)
-        textstyle.bold = false
-        textstyle.italic = false
-        textstyle.underline = false
-        textstyle.strikethrough = false
-        textstyle.list = false
-
-        for (span in allSpans) {
-            if (spannable.getSpanStart(span) <= start && spannable.getSpanEnd(span) >= end)
-                when (span) {
-                    is BoldSpan -> textstyle.bold = true
-                    is ItalicSpan -> textstyle.italic = true
-                    is RealUnderlineSpan -> textstyle.underline = true
-                    is StrikethroughSpan -> textstyle.strikethrough = true
-                    is ListSpan -> textstyle.list = true
-                }
-        }
-        binding.bold.setBackgroundColor(if (textstyle.bold) Color.parseColor("#19000000") else Color.TRANSPARENT)
-        binding.italic.setBackgroundColor(if (textstyle.italic) Color.parseColor("#19000000") else Color.TRANSPARENT)
-        binding.underline.setBackgroundColor(if (textstyle.underline) Color.parseColor("#19000000") else Color.TRANSPARENT)
-        binding.strikethrough.setBackgroundColor(if (textstyle.strikethrough) Color.parseColor("#19000000") else Color.TRANSPARENT)
-        binding.bullet.setBackgroundColor(if (textstyle.list) Color.parseColor("#19000000") else Color.TRANSPARENT)
+        val style = textstyle.value!!
+        val (type, bool) = when (v) {
+            binding.bold -> { style.bold = !style.bold; Pair(1, style.bold) }
+            binding.italic -> { style.italic = !style.italic; Pair(2, style.italic) }
+            binding.underline -> { style.underline = !style.underline; Pair(3, style.underline) }
+            binding.strikethrough -> { style.strikethrough = !style.strikethrough; Pair(4, style.strikethrough) }
+            else -> { style.list = !style.list; Pair(5, textstyle.value!!.list) } }
+        textstyle.value = style
+        if (binding.text.hasSelection() || type==5) Spans().apply(binding.text.text!!, binding.text.selectionStart, binding.text.selectionEnd, type, bool)
     }
 
     fun checkSelection(start: Int, end: Int) {
-        if (start or end < binding.text.length()) {
-            if (start==end)  if(binding.text.text!![start]=='\ufeff') binding.text.setSelection(start+1)
-        }
-    }
-
-    fun blank(v: View) {
-        binding.text.clearFocus()
-        v.requestFocus()
-        binding.text.requestFocus()
-        binding.text.setSelection(binding.text.text!!.length)
-        imm.showSoftInput(binding.text, InputMethodManager.SHOW_IMPLICIT)
-    }
-
-    fun pickColor(v: View) {
-        if (v != binding.color) {
-            binding.body.animate()
-                .translationY(if (binding.body.translationY == 0f) binding.color.height.toFloat() else 0f)
-                .duration = 150
-        }
+        if (start and end < binding.text.length())
+            if (binding.text.text!![start]=='\ufeff')
+                if (start==end) binding.text.setSelection(start+1)
+                else binding.text.setSelection(start+1, end)
     }
 
     fun setColor(v: View) {
-        color = when (v) {
-            binding.red -> 1; binding.yellow -> 2; binding.green -> 3; binding.blue -> 4; binding.purple -> 5; binding.grey -> 6; else -> color }
-        val colorCode = when (color) {
-            1 -> Pair(R.color.redBackground, R.color.redBackgroundDark)
-            2 -> Pair(R.color.yellowBackground, R.color.yellowBackgroundDark)
-            3 -> Pair(R.color.greenBackground, R.color.greenBackgroundDark)
-            4 ->  Pair(R.color.blueBackground, R.color.blueBackgroundDark)
-            5 ->  Pair(R.color.purpleBackground, R.color.purpleBackgroundDark)
-            else ->  Pair(R.color.greyBackground, R.color.greyBackgroundDark) }
-        binding.mainplus.setBackgroundColor(resources.getColor(colorCode.second, this.theme))
-        binding.parent.setBackgroundColor(resources.getColor(colorCode.first, this.theme))
-        binding.main.setBackgroundColor(resources.getColor(colorCode.first, this.theme))
-        binding.body.setBackgroundColor(resources.getColor(colorCode.first, this.theme))
-        window.navigationBarColor = resources.getColor(colorCode.first, this.theme)
-        pickColor(v)
-    }
-
-    fun hideImeBar(v: View) {
-        binding.imebar.visibility = View.GONE
-        binding.showime.visibility = View.VISIBLE
-    }
-
-    fun showImeBar(v: View) {
-        binding.showime.visibility = View.GONE
-        binding.imebar.visibility = View.VISIBLE
+        color.value = when (v) { binding.red -> 0; binding.yellow -> 1; binding.green -> 2; binding.blue -> 3; binding.purple -> 4; else -> 5 }
+        binding.pickcolor.performClick()
     }
 
     override fun onBackPressed() {
@@ -274,30 +142,25 @@ class NotesActivity : AppCompatActivity() {
             showKeyboard = true
             binding.text.clearFocus()
             binding.parent.requestFocus()
-            binding.imebar.visibility = View.GONE
             imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
         } else showKeyboard = false
-        //Save
-        val title = binding.title.text.toString()
-        val text = binding.text.text.toString()
         if (binding.title.text!!.isNotBlank() || binding.text.text!!.isNotBlank()) {
             val spannable = binding.text.text as Spannable
-            val styleSpans = spannable.getSpans(0, binding.text.text!!.length, Any::class.java)
             val spansData = mutableListOf<SpanData>()
-            for (span in styleSpans) {
-                val classType = when (span) {
-                    is BoldSpan -> 1
-                    is ItalicSpan -> 2
-                    is RealUnderlineSpan -> 3
-                    is StrikethroughSpan -> 4
-                    is ListSpan -> 5
-                    else -> 0
-                }
-                if (classType!=0) spansData.add(SpanData(classType, spannable.getSpanStart(span), spannable.getSpanEnd(span)))
+            val spans = spannable.getSpans(0, binding.text.text!!.length, Any::class.java)
+            spans.forEach { span ->
+                val type = when (span) { is BoldSpan -> 1; is ItalicSpan -> 2; is RealUnderlineSpan -> 3; is StrikethroughSpan -> 4; is ListSpan -> 5; else -> 0 }
+                if (type!=0) spansData.add(SpanData(type, spannable.getSpanStart(span), spannable.getSpanEnd(span)))
             }
-            Backend.insertOrUpdate(id, note?.createdTime ?: Clock.System.now().toEpochMilliseconds(), title, text, Json.encodeToString(spansData), color)
+            Backend.insert(id, note.createdTime, binding.title.text.toString(), binding.text.text.toString(), Json.encodeToString(spansData), color.value!!)
         } else if (id!=0) {
             Backend.delete(id)
         }
+    }
+
+    open inner class CustomTextWatcher: TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        override fun afterTextChanged(s: Editable?) { if (binding.body.translationY!=0f) binding.pickcolor.performClick() }
     }
 }

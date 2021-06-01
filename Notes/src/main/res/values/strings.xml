@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Notes</string>
+    <string name="app_title">Quick Notes</string>
+    <string name="search">Search ...</string>
 </resources>

@@ -111,11 +111,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun addEntry(note: Note) {
         val colorCode = when (note.color) {
-            1 -> R.color.redPreview
-            2 -> R.color.yellowPreview
-            3 -> R.color.greenPreview
-            4 ->  R.color.bluePreview
-            5 ->  R.color.purplePreview
+            0 -> R.color.redPreview
+            1 -> R.color.yellowPreview
+            2 -> R.color.greenPreview
+            3 ->  R.color.bluePreview
+            4 ->  R.color.purplePreview
             else ->  R.color.greyPreview }
 
         val title = AppCompatTextView(this)
