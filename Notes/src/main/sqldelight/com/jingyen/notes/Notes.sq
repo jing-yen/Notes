@@ -1,17 +1,14 @@
 CREATE TABLE Note (
     id INTEGER AS Int NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT,
-    appRevision INTEGER AS Int NOT NULL,
-    modifiedTime INTEGER NOT NULL,
-    createdTime INTEGER NOT NULL,
+    meta TEXT NOT NULL,
     title TEXT NOT NULL,
     text TEXT NOT NULL,
-    spansData TEXT NOT NULL,
-    color INTEGER AS Int NOT NULL
+    spansData TEXT NOT NULL
 );
 
 insert:
-INSERT OR REPLACE INTO Note(id, appRevision, modifiedTime, createdTime, title, text, spansData, color)
-VALUES (?, ?, ? ,?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO Note(id, meta, title, text, spansData)
+VALUES (?, ?, ? ,?, ?);
 
 highestId:
 SELECT id FROM Note ORDER BY id DESC LIMIT 1;
@@ -20,7 +17,7 @@ select:
 SELECT * FROM Note WHERE id = ?;
 
 selectAll:
-SELECT * FROM Note ORDER BY modifiedTime DESC;
+SELECT * FROM Note ORDER BY id DESC;
 
 delete:
 DELETE FROM Note WHERE id = ?;

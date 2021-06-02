@@ -29,7 +29,6 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.jingyen.notes.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlin.math.sqrt
@@ -47,7 +46,7 @@ class MainActivity : AppCompatActivity() {
 
     private var sortBy = 0
     private var password = ""
-    private var notes: List<Note> = emptyList()
+    private var notes: MutableList<FastDecodedNote> = mutableListOf()
 
     private var sensorManager: SensorManager? = null
     private val SHAKE_THRESHOLD_GRAVITY = 2.3f
@@ -101,18 +100,17 @@ class MainActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val sortedNotes = when (sortBy) { 0 -> notes; 1 -> notes.sortedByDescending { it.createdTime }; else -> notes.sortedBy { it.color } }
                 binding.entries.removeAllViews()
-                if (start + count > 0) sortedNotes.forEach { note -> if (note.title.contains(s!!, ignoreCase = true) || note.text.contains(s, ignoreCase = true)) addEntry(note) }
-                else for (note in sortedNotes) addEntry(note)
+                if (start + count > 0) notes.forEach { note -> if (note.title.contains(s!!, ignoreCase = true) || note.text.contains(s, ignoreCase = true)) addEntry(note) }
+                else for (note in notes) addEntry(note)
             }
         })
 
-        Backend.getAll(this@MainActivity)
+        Backend.getAllFast(this@MainActivity)
         binding.root.post {
             CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
                 Backend.mutableNotes.collect { mutableNotesValue ->
-                    notes = mutableNotesValue
+                    notes = mutableNotesValue.toMutableList()
                     sort(when (sortBy) { 0 -> binding.sortModifiedTime; 1 -> binding.sortCreatedTime; else -> binding.sortColor})
                 }
             }
@@ -129,8 +127,8 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
     }
 
-    private fun addEntry(note: Note) {
-        val colorCode = when (note.color) {
+    private fun addEntry(note: FastDecodedNote) {
+        val colorCode = when (note.meta.color) {
             0 -> R.color.redPreview
             1 -> R.color.yellowPreview
             2 -> R.color.greenPreview
@@ -181,8 +179,12 @@ class MainActivity : AppCompatActivity() {
     fun sort(v: View) {
         binding.entries.removeAllViews()
         sortBy = when (v) { binding.sortModifiedTime -> 0; binding.sortCreatedTime -> 1; else -> 2 }
-        val sortedNotes = when (sortBy) { 0 -> notes; 1 -> notes.sortedByDescending { it.createdTime }; else -> notes.sortedBy { it.color } }
-        for (note in sortedNotes) addEntry(note)
+        when (sortBy) {
+            0 -> notes.sortByDescending { it.meta.modifiedTime }
+            1 -> notes.sortByDescending { it.meta.createdTime }
+            else -> notes.sortBy { it.meta.color }
+        }
+        for (note in notes) addEntry(note)
         binding.sortModifiedTime.background = null
         binding.sortCreatedTime.background = null
         binding.sortColor.background = null

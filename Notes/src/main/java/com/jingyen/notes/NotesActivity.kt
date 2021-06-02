@@ -14,16 +14,13 @@ import androidx.lifecycle.MutableLiveData
 import com.jingyen.notes.databinding.ActivityNotesBinding
 import kotlinx.coroutines.*
 import kotlinx.datetime.Clock
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 class NotesActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNotesBinding
     private lateinit var imm: InputMethodManager
     private var showKeyboard = false
     private var id = 0
-    private var note = Note(0, 1, Clock.System.now().toEpochMilliseconds(), Clock.System.now().toEpochMilliseconds(), "", "", Json.encodeToString(emptyList<SpanData>()), 1)
+    private var note = DecodedNote(0, Meta(1, Clock.System.now().toEpochMilliseconds(), Clock.System.now().toEpochMilliseconds(), 1, false), "", "", emptyList())
     private var color = MutableLiveData(1)
     var textstyle = MutableLiveData(TextStyle(bold = false, italic = false, underline = false, strikethrough = false, list = false))
 
@@ -36,10 +33,10 @@ class NotesActivity : AppCompatActivity() {
         id = intent.getIntExtra("id", 0)
         if (id!=0) { CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
             note = withContext(Dispatchers.IO) { Backend.get(id) }
-            color.value = note.color
+            color.value = note.meta.color
             binding.title.setText(note.title)
             binding.text.setText(note.text)
-            Json.decodeFromString<List<SpanData>>(note.spansData).forEach { span ->
+            note.spansData.forEach { span ->
                 (binding.text.text as Spannable).setSpan(when (span.spanType) {
                     1 -> BoldSpan(); 2 -> ItalicSpan(); 3 -> RealUnderlineSpan(); 4 -> StrikethroughSpan(); else -> ListSpan(15, 25) },
                     span.start, span.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE) }
@@ -152,7 +149,7 @@ class NotesActivity : AppCompatActivity() {
                 val type = when (span) { is BoldSpan -> 1; is ItalicSpan -> 2; is RealUnderlineSpan -> 3; is StrikethroughSpan -> 4; is ListSpan -> 5; else -> 0 }
                 if (type!=0) spansData.add(SpanData(type, spannable.getSpanStart(span), spannable.getSpanEnd(span)))
             }
-            Backend.insert(id, note.createdTime, binding.title.text.toString(), binding.text.text.toString(), Json.encodeToString(spansData), color.value!!)
+            Backend.insert(id, Meta(1, Clock.System.now().toEpochMilliseconds(), note.meta.createdTime, color.value!!, false), binding.title.text.toString(), binding.text.text.toString(), spansData)
         } else if (id!=0) {
             Backend.delete(id)
         }
