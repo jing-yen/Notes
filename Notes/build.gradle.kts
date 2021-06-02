@@ -42,7 +42,7 @@ android {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.1")
     implementation("com.squareup.sqldelight:android-driver:1.5.0")
     implementation("com.squareup.sqldelight:coroutines-extensions-jvm:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
@@ -57,6 +57,7 @@ dependencies {
     implementation ("androidx.emoji2:emoji2:1.0.0-alpha01")
     implementation ("com.google.android.material:material:1.3.0")
     implementation ("androidx.constraintlayout:constraintlayout:2.1.0-beta02")
+    implementation("androidx.datastore:datastore-preferences:1.0.0-beta01")
     testImplementation ("junit:junit:4.13.2")
     androidTestImplementation ("androidx.test.ext:junit:1.1.2")
     androidTestImplementation ("androidx.test.espresso:espresso-core:3.3.0")

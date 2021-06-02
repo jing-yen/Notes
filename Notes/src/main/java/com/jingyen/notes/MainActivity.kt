@@ -21,10 +21,20 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import com.jingyen.notes.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
 import kotlin.math.sqrt
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "SETTINGS")
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         get() = (this * Resources.getSystem().displayMetrics.density).toInt()
 
     private var sortBy = 0
+    private var password = ""
     private var notes: List<Note> = emptyList()
 
     private var sensorManager: SensorManager? = null
@@ -58,6 +69,15 @@ class MainActivity : AppCompatActivity() {
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
+        CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
+            applicationContext.dataStore.data
+                .map { preferences -> preferences[intPreferencesKey("SORT")] ?: 0 }
+                .collect { value -> sortBy = value }
+            applicationContext.dataStore.data
+                .map { preferences -> preferences[stringPreferencesKey("PASSWORD")] ?: "" }
+                .collect { value -> password = value }
+        }
 
         binding.search.setOnFocusChangeListener { _, b ->
             if (b) {
@@ -167,6 +187,10 @@ class MainActivity : AppCompatActivity() {
         binding.sortCreatedTime.background = null
         binding.sortColor.background = null
         v.background = resources.getDrawable(R.drawable.sortbar, this.theme)
+
+        CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
+            applicationContext.dataStore.edit { settings -> settings[intPreferencesKey("SORT")] = sortBy }
+        }
 
         binding.sortButtons.visibility = View.INVISIBLE
         binding.entries.animate()
