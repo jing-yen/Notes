@@ -2,4 +2,34 @@
     <string name="app_name">Notes</string>
     <string name="app_title">Quick Notes</string>
     <string name="search">Search ...</string>
+    <string name="sortText">Sort by: %1$s</string>
+    <string name="modifiedTime">Modified Time</string>
+    <string name="createdTime">Created Time</string>
+    <string name="colour">Colour</string>
+    <!-- NotesActivity.kt -->
+    <string name="hintTitle">Untitled</string>
+    <string name="hintText">Start typing...</string>
+    <string name="remindTip">Set alarm or reminder</string>
+    <string name="colourTip">Change note colour</string>
+    <string name="optionsTip">More options</string>
+    <!-- Options bottom sheet -->
+    <string name="words">%1$d words</string>
+    <string name="lock">Lock</string>
+    <string name="unlock">Unlock</string>
+    <string name="remind">Remind or alarm</string>
+    <string name="share">Share</string>
+    <string name="homescreen">Place on home screen</string>
+    <string name="delete">Delete</string>
+    <!-- Options bottom sheet: Setting alarm/reminder -->
+    <string name="alarm">Alarm</string>
+    <string name="reminder">Reminder</string>
+    <string name="sundayshort">S</string>
+    <string name="mondayshort">M</string>
+    <string name="tuesdayshort">T</string>
+    <string name="wednesdayshort">W</string>
+    <string name="thursdayshort">T</string>
+    <string name="fridayshort">F</string>
+    <string name="saturdayshort">S</string>
+    <!--WidgetConfigurationActivity.kt-->
+    <string name="select">Select Note</string>
 </resources>

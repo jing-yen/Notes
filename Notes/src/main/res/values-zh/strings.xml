@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">便笺</string>
+    <string name="app_title">简易便笺</string>
+    <string name="search">搜索 ...</string>
+    <string name="hintTitle">标题</string>
+    <string name="hintText">记笔记 ...</string>
+    <string name="lock">封锁</string>
+    <string name="unlock">解锁</string>
+    <string name="share">分享</string>
+    <string name="homescreen">放到主屏上</string>
+    <string name="delete">删除</string>
+    <string name="optionsTip">更多选择</string>
+    <string name="colourTip">更换颜色</string>
+    <string name="remindTip">设置提醒</string>
+    <string name="sortText">排序方式 : %1$s</string>
+    <string name="modifiedTime">按编辑日期</string>
+    <string name="createdTime">按创建日期</string>
+    <string name="colour">按颜色</string>
+    <string name="words">%1$d 个字</string>
+    <string name="select">请选择便笺</string>
+    <string name="remind">提醒 / 闹钟</string>
+    <string name="sundayshort">日</string>
+    <string name="mondayshort">一</string>
+    <string name="tuesdayshort">二</string>
+    <string name="wednesdayshort">三</string>
+    <string name="thursdayshort">四</string>
+    <string name="fridayshort">五</string>
+    <string name="saturdayshort">六</string>
+    <string name="sundayshortu"><u>日</u></string>
+    <string name="mondayshortu"><u>一</u></string>
+    <string name="tuesdayshortu"><u>二</u></string>
+    <string name="wednesdayshortu"><u>三</u></string>
+    <string name="thursdayshortu"><u>四</u></string>
+    <string name="fridayshortu"><u>五</u></string>
+    <string name="saturdayshortu"><u>六</u></string>
+    <string name="alarm">闹钟</string>
+    <string name="reminder">提醒</string>
+</resources>

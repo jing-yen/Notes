@@ -10,6 +10,10 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import android.icu.text.BreakIterator
+import android.os.Build
+import androidx.annotation.RequiresApi
+import kotlin.collections.HashMap
 
 data class TextStyle(
     var bold: Boolean,
@@ -44,9 +48,15 @@ object Backend {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    private fun init(applicationContext: Context) {
+        if (!this::androidSqlDriver.isInitialized||!this::notesQueries.isInitialized) {
+            androidSqlDriver = AndroidSqliteDriver(schema = Database.Schema, context = applicationContext, name = "items.db")
+            notesQueries = Database(androidSqlDriver).notesQueries
+        }
+    }
+
     fun getAllFast(applicationContext: Context) {
-        androidSqlDriver = AndroidSqliteDriver(schema = Database.Schema, context = applicationContext, name = "items.db")
-        notesQueries = Database(androidSqlDriver).notesQueries
+        init(applicationContext)
         scope.launch {
             notesQueries.selectAll().asFlow().mapToList().collect { values ->
                 mutableNotes.value = values.map { value -> FastDecodedNote(value.id, Json.decodeFromString(value.meta), value.title, value.text) }
@@ -54,7 +64,8 @@ object Backend {
         }
     }
 
-    fun get(id: Int): DecodedNote {
+    fun get(id: Int, applicationContext: Context): DecodedNote {
+        init(applicationContext)
         val note = notesQueries.select(id).executeAsOne()
         return DecodedNote(note.id, Json.decodeFromString(note.meta), note.title, note.text, Json.decodeFromString(note.spansData))
     }
@@ -67,13 +78,78 @@ object Backend {
         }
     }
 
-    fun highestId(): Int {
-        return try {
-            notesQueries.highestId().executeAsOne()+1
-        } catch (ex: NullPointerException) { 1 }
+    fun highestId(applicationContext: Context): Int {
+        init(applicationContext)
+        return try { notesQueries.highestId().executeAsOne()+1 } catch (ex: NullPointerException) { 1 }
     }
 
     fun delete(id: Int) {
         scope.launch { withContext(NonCancellable) { notesQueries.delete(id) } }
+    }
+}
+
+object WordCounter {
+    private lateinit var breakIterator: BreakIterator
+    private lateinit var breakIteratorPre24: java.text.BreakIterator
+
+    init {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            breakIterator = BreakIterator.getWordInstance()
+        } else {
+            breakIteratorPre24 = java.text.BreakIterator.getWordInstance()
+        }
+    }
+
+    fun countWords(text: String): Int {
+        val wordCounts: MutableMap<String, WordCount> = HashMap()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            breakIterator.setText(text)
+            var wordBoundaryIndex: Int = breakIterator.first()
+            var prevIndex = 0
+            while (wordBoundaryIndex != BreakIterator.DONE) {
+                val word = text.substring(prevIndex, wordBoundaryIndex).lowercase()
+                if (isWord(word)) {
+                    var wordCount = wordCounts[word]
+                    if (wordCount == null) {
+                        wordCount = WordCount()
+                        wordCount.word = word
+                    }
+                    wordCount.count++
+                    wordCounts[word] = wordCount
+                }
+                prevIndex = wordBoundaryIndex
+                wordBoundaryIndex = breakIterator.next()
+            }
+        } else {
+            breakIteratorPre24.setText(text)
+            var wordBoundaryIndex: Int = breakIteratorPre24.first()
+            var prevIndex = 0
+            while (wordBoundaryIndex != java.text.BreakIterator.DONE) {
+                val word = text.substring(prevIndex, wordBoundaryIndex).lowercase()
+                if (isWord(word)) {
+                    var wordCount = wordCounts[word]
+                    if (wordCount == null) {
+                        wordCount = WordCount()
+                        wordCount.word = word
+                    }
+                    wordCount.count++
+                    wordCounts[word] = wordCount
+                }
+                prevIndex = wordBoundaryIndex
+                wordBoundaryIndex = breakIteratorPre24.next()
+            }
+        }
+        return wordCounts.size
+    }
+
+    private fun isWord(word: String): Boolean {
+        return if (word.length == 1) {
+            Character.isLetterOrDigit(word[0])
+        } else "" != word.trim { it <= ' ' }
+    }
+
+    class WordCount {
+        var word: String? = null
+        var count = 0
     }
 }

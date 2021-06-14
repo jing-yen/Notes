@@ -17,4 +17,32 @@
         <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
     </style>
+
+    <style name="RedMaterialAlertDialog" parent="MaterialAlertDialog">
+        <item name="colorSurface">@color/redBackground</item>
+    </style>
+    <style name="YellowMaterialAlertDialog" parent="MaterialAlertDialog">
+        <item name="colorSurface">@color/yellowBackground</item>
+    </style>
+    <style name="GreenMaterialAlertDialog" parent="MaterialAlertDialog">
+        <item name="colorSurface">@color/greenBackground</item>
+    </style>
+    <style name="BlueMaterialAlertDialog" parent="MaterialAlertDialog">
+        <item name="colorSurface">@color/blueBackground</item>
+    </style>
+    <style name="PurpleMaterialAlertDialog" parent="MaterialAlertDialog">
+        <item name="colorSurface">@color/purpleBackground</item>
+    </style>
+    <style name="GreyMaterialAlertDialog" parent="MaterialAlertDialog">
+        <item name="colorSurface">@color/greyBackground</item>
+    </style>
+    <style name="MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:textSize">18sp</item>
+        <item name="fontFamily">@font/regular</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/BodyTextStyle</item>
+    </style>
+    <style name="BodyTextStyle" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+        <item name="android:textSize">16sp</item>
+        <item name="fontFamily">@font/regular</item>
+    </style>
 </resources>

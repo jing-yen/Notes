@@ -198,7 +198,7 @@ class MainActivity : AppCompatActivity() {
         binding.entries.animate()
             .translationY(-binding.sortButtons.height.toFloat())
             .duration = 100
-        binding.sortText.text = "Sort by: ${when (sortBy) { 0 -> "Modified Time"; 1 -> "Created Time"; else -> "Colour" }}"
+        binding.sortText.text = getString(R.string.sortText, when (sortBy) { 0 -> getString(R.string.modifiedTime); 1 -> getString(R.string.createdTime); else -> getString(R.string.colour) })
     }
 
     fun showSort(v: View) {

@@ -14,21 +14,27 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
 
+    <color name="redText">#FF9999</color>
     <color name="redPreview">#804045</color>
     <color name="redBackground">#1B1B1B</color>
     <color name="redBackgroundDark">#995C62</color>
+    <color name="yellowText">#FFEC80</color>
     <color name="yellowPreview">#99852E</color>
     <color name="yellowBackground">#1B1B1B</color>
     <color name="yellowBackgroundDark">#99843D</color>
+    <color name="greenText">#AAFA96</color>
     <color name="greenPreview">#408040</color>
     <color name="greenBackground">#1B1B1B</color>
     <color name="greenBackgroundDark">#68995C</color>
+    <color name="blueText">#A6D4FF</color>
     <color name="bluePreview">#406A80</color>
     <color name="blueBackground">#1B1B1B</color>
     <color name="blueBackgroundDark">#5C8499</color>
+    <color name="purpleText">#D1A6FF</color>
     <color name="purplePreview">#63428F</color>
     <color name="purpleBackground">#1B1B1B</color>
     <color name="purpleBackgroundDark">#755C99</color>
+    <color name="greyText">#B3B3B3</color>
     <color name="greyPreview">#666666</color>
     <color name="greyBackground">#1B1B1B</color>
     <color name="greyBackgroundDark">#999999</color>

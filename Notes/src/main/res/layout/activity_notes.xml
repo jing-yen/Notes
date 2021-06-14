@@ -34,35 +34,36 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/avd"
+                android:id="@+id/options"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
-                android:paddingTop="16dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/add"
-                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
-
-            <ImageView
-                android:id="@+id/pickcolor"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:paddingStart="22dp"
+                android:paddingTop="22dp"
                 android:paddingEnd="22dp"
+                android:paddingBottom="22dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/more"
+                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+            <ImageView
+                android:id="@+id/color"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:paddingStart="18dp"
+                android:paddingEnd="16dp"
+                android:rotationY="0"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/options"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/palette"
                 tools:ignore="SpeakableTextPresentCheck" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
-            android:id="@+id/color"
+            android:id="@+id/colorbar"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:orientation="horizontal"
@@ -168,7 +169,7 @@
                         android:ems="10"
                         android:fontFamily="@font/semibold"
                         android:gravity="start|top"
-                        android:hint="Untitled"
+                        android:hint="@string/hintTitle"
                         android:inputType="textMultiLine|textCapSentences"
                         android:minHeight="0dp"
                         android:textColor="@color/text"
@@ -184,7 +185,7 @@
                         android:ems="10"
                         android:fontFamily="@font/regular"
                         android:gravity="start|top"
-                        android:hint="Start typing..."
+                        android:hint="@string/hintText"
                         android:inputType="textMultiLine|textCapSentences"
                         android:lineSpacingMultiplier="1.3"
                         android:minHeight="48dp"
@@ -207,7 +208,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/imebar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -217,88 +218,80 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:visibility="gone">
+            tools:visibility="visible">
 
             <ImageView
                 android:id="@+id/bold"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:onClick="stylize"
-                android:paddingStart="12dp"
                 android:paddingTop="8dp"
-                android:paddingEnd="16dp"
                 android:paddingBottom="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/bold"
                 tools:ignore="SpeakableTextPresentCheck" />
 
             <ImageView
                 android:id="@+id/italic"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:onClick="stylize"
                 android:paddingStart="16dp"
+                android:paddingTop="8dp"
                 android:paddingEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/bold"
-                app:layout_constraintTop_toTopOf="parent"
+                android:paddingBottom="8dp"
                 app:srcCompat="@drawable/italics"
                 tools:ignore="SpeakableTextPresentCheck" />
 
             <ImageView
                 android:id="@+id/underline"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:onClick="stylize"
                 android:paddingStart="16dp"
+                android:paddingTop="8dp"
                 android:paddingEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/italic"
-                app:layout_constraintTop_toTopOf="parent"
+                android:paddingBottom="8dp"
                 app:srcCompat="@drawable/underlined"
                 tools:ignore="SpeakableTextPresentCheck" />
 
             <ImageView
                 android:id="@+id/strikethrough"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:onClick="stylize"
                 android:paddingStart="16dp"
+                android:paddingTop="8dp"
                 android:paddingEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/underline"
-                app:layout_constraintTop_toTopOf="parent"
+                android:paddingBottom="8dp"
                 app:srcCompat="@drawable/strikethrough"
                 tools:ignore="SpeakableTextPresentCheck" />
 
             <ImageView
                 android:id="@+id/bullet"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:onClick="stylize"
                 android:paddingStart="16dp"
+                android:paddingTop="8dp"
                 android:paddingEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/strikethrough"
-                app:layout_constraintTop_toTopOf="parent"
+                android:paddingBottom="8dp"
                 app:srcCompat="@drawable/list"
                 tools:ignore="SpeakableTextPresentCheck" />
 
             <ImageView
                 android:id="@+id/hideime"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/down"
-                tools:ignore="SpeakableTextPresentCheck" />
+                android:visibility="gone" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/showime"
@@ -317,6 +310,544 @@
             app:srcCompat="@drawable/down" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/scrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="@color/text"
+        android:elevation="8dp"
+        android:fitsSystemWindows="true"
+        android:visibility="gone">
+
+    </View>
+
+    <LinearLayout
+        android:id="@+id/options_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:background="@drawable/grey_bottom_sheet"
+        android:elevation="8dp"
+        android:orientation="vertical"
+        android:paddingTop="16dp"
+        app:behavior_hideable="true"
+        app:behavior_skipCollapsed="true"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        tools:visibility="gone">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/actions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="16dp"
+                    tools:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/wordcount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="8dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/regular"
+                        android:textColor="@color/text"
+                        android:textSize="16sp" />
+
+                    <LinearLayout
+                        android:id="@+id/actionlock"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <ImageView
+                            android:id="@+id/actionlock_iv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            app:srcCompat="@drawable/lock" />
+
+                        <TextView
+                            android:id="@+id/actionlock_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/regular"
+                            android:paddingStart="16dp"
+                            android:text="@string/lock"
+                            android:textColor="@color/text"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/actionreminder"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:visibility="gone"
+                        tools:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/actionreminder_iv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            app:srcCompat="@drawable/notifications_none" />
+
+                        <TextView
+                            android:id="@+id/actionreminder_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/regular"
+                            android:paddingStart="16dp"
+                            android:text="@string/remind"
+                            android:textColor="@color/text"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/actionshare"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <ImageView
+                            android:id="@+id/actionshare_iv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            app:srcCompat="@drawable/share" />
+
+                        <TextView
+                            android:id="@+id/actionshare_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/regular"
+                            android:paddingStart="16dp"
+                            android:text="@string/share"
+                            android:textColor="@color/text"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/actiondelete"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <ImageView
+                            android:id="@+id/actiondelete_iv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            app:srcCompat="@drawable/delete" />
+
+                        <TextView
+                            android:id="@+id/actiondelete_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/regular"
+                            android:paddingStart="16dp"
+                            android:text="@string/delete"
+                            android:textColor="@color/text"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/setupreminder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+
+                    <LinearLayout
+                        android:id="@+id/alarm_or_reminder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:id="@+id/alarmbutton"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="16dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/grey_rounded_button"
+                            android:gravity="center_horizontal"
+                            android:orientation="horizontal"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/alarmbutton_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:drawablePadding="8dp"
+                                android:fontFamily="@font/regular"
+                                android:text="@string/alarm"
+                                android:textColor="@color/background"
+                                android:textSize="16sp"
+                                app:drawableStartCompat="@drawable/alarm" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/reminderbutton"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="16dp"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:orientation="horizontal"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/reminderbutton_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:drawablePadding="8dp"
+                                android:fontFamily="@font/regular"
+                                android:text="@string/reminder"
+                                android:textColor="@color/text"
+                                android:textSize="16sp"
+                                app:drawableStartCompat="@drawable/calendar" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/alarm"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="16dp">
+
+                        <TableLayout
+                            android:id="@+id/alarmtime"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:paddingTop="24dp"
+                            android:paddingBottom="32dp">
+
+                            <TableRow
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent">
+
+                                <View
+                                    android:id="@+id/view6"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1" />
+
+                                <TextView
+                                    android:id="@+id/alarmtimehour"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/regular"
+                                    android:text="12"
+                                    android:textColor="@color/greyText"
+                                    android:textSize="34sp" />
+
+                                <TextView
+                                    android:id="@+id/alarmtimespace"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/regular"
+                                    android:text=":"
+                                    android:textColor="@color/greyText"
+                                    android:textSize="34sp" />
+
+                                <TextView
+                                    android:id="@+id/alarmtimeminute"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/regular"
+                                    android:text="00"
+                                    android:textColor="@color/greyText"
+                                    android:textSize="34sp" />
+
+                                <TextView
+                                    android:id="@+id/alarmtimeseparator"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/regular"
+                                    android:text=" "
+                                    android:textColor="@color/greyText"
+                                    android:textSize="34sp"
+                                    tools:ignore="SpeakableTextPresentCheck" />
+
+                                <TextView
+                                    android:id="@+id/alarmtimeend"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/regular"
+                                    android:text="a.m."
+                                    android:textColor="@color/greyText"
+                                    android:textSize="34sp" />
+
+                                <View
+                                    android:id="@+id/view5"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1" />
+                            </TableRow>
+
+                            <TableRow
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginTop="8dp">
+
+                                <TextView
+                                    android:id="@+id/alarmcalc"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/regular"
+                                    android:text="Happening in 3 hours 10 minutes"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/text"
+                                    android:textSize="15sp" />
+                            </TableRow>
+
+                        </TableLayout>
+
+                        <View
+                            android:id="@+id/divider4"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginBottom="4dp"
+                            android:background="?android:attr/listDivider" />
+
+                        <TextView
+                            android:id="@+id/alarmrepeatmode_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/regular"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:text="Repeat: Once"
+                            android:textColor="@color/text"
+                            android:textSize="17sp"
+                            app:drawableEndCompat="@drawable/next" />
+
+                        <LinearLayout
+                            android:id="@+id/daysofweek"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="16dp"
+                            android:orientation="horizontal"
+                            android:visibility="gone"
+                            android:weightSum="1">
+
+                            <TextView
+                                android:id="@+id/sun"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.14"
+                                android:fontFamily="@font/regular"
+                                android:onClick="chooseDay"
+                                android:text="@string/sundayshort"
+                                android:textAlignment="center"
+                                android:textColor="@color/lightText"
+                                android:textSize="24sp"
+                                tools:ignore="TouchTargetSizeCheck" />
+
+                            <TextView
+                                android:id="@+id/mon"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.14"
+                                android:fontFamily="@font/regular"
+                                android:onClick="chooseDay"
+                                android:text="@string/mondayshort"
+                                android:textAlignment="center"
+                                android:textColor="@color/lightText"
+                                android:textSize="24sp"
+                                tools:ignore="TouchTargetSizeCheck" />
+
+                            <TextView
+                                android:id="@+id/tue"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.14"
+                                android:fontFamily="@font/regular"
+                                android:onClick="chooseDay"
+                                android:text="@string/tuesdayshort"
+                                android:textAlignment="center"
+                                android:textColor="@color/lightText"
+                                android:textSize="24sp"
+                                tools:ignore="TouchTargetSizeCheck" />
+
+                            <TextView
+                                android:id="@+id/wed"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.14"
+                                android:fontFamily="@font/regular"
+                                android:onClick="chooseDay"
+                                android:text="@string/wednesdayshort"
+                                android:textAlignment="center"
+                                android:textColor="@color/lightText"
+                                android:textSize="24sp"
+                                tools:ignore="TouchTargetSizeCheck" />
+
+                            <TextView
+                                android:id="@+id/thu"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.14"
+                                android:fontFamily="@font/regular"
+                                android:onClick="chooseDay"
+                                android:text="@string/thursdayshort"
+                                android:textAlignment="center"
+                                android:textColor="@color/lightText"
+                                android:textSize="24sp"
+                                tools:ignore="TouchTargetSizeCheck" />
+
+                            <TextView
+                                android:id="@+id/fri"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.14"
+                                android:fontFamily="@font/regular"
+                                android:onClick="chooseDay"
+                                android:text="@string/fridayshort"
+                                android:textAlignment="center"
+                                android:textColor="@color/lightText"
+                                android:textSize="24sp"
+                                tools:ignore="TouchTargetSizeCheck" />
+
+                            <TextView
+                                android:id="@+id/sat"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.14"
+                                android:fontFamily="@font/regular"
+                                android:onClick="chooseDay"
+                                android:text="@string/saturdayshort"
+                                android:textAlignment="center"
+                                android:textColor="@color/lightText"
+                                android:textSize="24sp"
+                                tools:ignore="TouchTargetSizeCheck,TouchTargetSizeCheck,TouchTargetSizeCheck" />
+                        </LinearLayout>
+
+                        <View
+                            android:id="@+id/divider2"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:background="?android:attr/listDivider" />
+
+                        <TextView
+                            android:id="@+id/alarmringtonemode_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:fontFamily="@font/regular"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:text="Ringtone: Default"
+                            android:textColor="@color/text"
+                            android:textSize="17sp"
+                            app:drawableEndCompat="@drawable/next" />
+
+                        <View
+                            android:id="@+id/divider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="64dp"
+                            android:background="?android:attr/listDivider" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"></LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/buttons"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:orientation="horizontal"
+                        android:visibility="visible">
+
+                        <TextView
+                            android:id="@+id/alarmback"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/regular"
+                            android:onClick="goback"
+                            android:paddingTop="12dp"
+                            android:paddingBottom="12dp"
+                            android:text="Back"
+                            android:textAlignment="center"
+                            android:textColor="@color/lightText"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/alarmdone"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/regular"
+                            android:onClick="goback"
+                            android:paddingTop="12dp"
+                            android:paddingBottom="12dp"
+                            android:text="Done"
+                            android:textAlignment="center"
+                            android:textColor="@color/greyText"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+    </LinearLayout>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
