@@ -47,13 +47,14 @@
                 android:id="@+id/color"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
+                android:contentDescription="TODO"
                 android:paddingStart="22dp"
                 android:paddingEnd="22dp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/open"
-                android:contentDescription="TODO" />
+                app:srcCompat="@drawable/open" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -167,41 +168,102 @@
                         android:layout_marginTop="12dp"
                         android:layout_marginEnd="16dp"
                         android:layout_marginBottom="-20dp"
-                        android:onClick="showSort"
                         android:orientation="vertical"
                         tools:ignore="TouchTargetSizeCheck">
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="4dp"
                             android:orientation="horizontal">
 
-                            <ImageView
-                                android:id="@+id/share_iv"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginEnd="8dp"
-                                android:scaleX="0.8"
-                                android:scaleY="0.8"
-                                app:srcCompat="@drawable/sort"
-                                android:contentDescription="TODO" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:onClick="showSort"
+                                android:orientation="horizontal"
+                                tools:ignore="TouchTargetSizeCheck">
 
-                            <TextView
-                                android:id="@+id/sortText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:fontFamily="@font/regular"
-                                android:paddingTop="4dp"
-                                android:paddingBottom="4dp"
-                                android:text="@string/sortText"
-                                android:textColor="@color/lightText"
-                                android:textSize="14sp"
-                                tools:ignore="TouchTargetSizeCheck" />
+                                <ImageView
+                                    android:id="@+id/share_iv"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center_vertical"
+                                    android:contentDescription="TODO"
+                                    android:paddingStart="8dp"
+                                    android:paddingEnd="8dp"
+                                    android:scaleX="0.8"
+                                    android:scaleY="0.8"
+                                    app:srcCompat="@drawable/sort"
+                                    tools:ignore="TouchTargetSizeCheck" />
+
+                                <TextView
+                                    android:id="@+id/sortText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center_vertical"
+                                    android:fontFamily="@font/regular"
+                                    android:paddingTop="4dp"
+                                    android:paddingBottom="4dp"
+                                    android:text="@string/sortText"
+                                    android:textColor="@color/lightText"
+                                    android:textSize="14sp"
+                                    tools:ignore="TouchTargetSizeCheck" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="0.5"
+                                android:onClick="unlock"
+                                android:orientation="horizontal"
+                                android:paddingEnd="8dp"
+                                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck">
+
+                                <View
+                                    android:id="@+id/view3"
+                                    android:layout_width="0dp"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1" />
+
+                                <TextView
+                                    android:id="@+id/exittext"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:fontFamily="@font/regular"
+                                    android:gravity="center_vertical"
+                                    android:paddingEnd="8dp"
+                                    android:text="Exit"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/lightText"
+                                    android:textSize="14sp"
+                                    android:visibility="gone"
+                                    tools:ignore="TouchTargetSizeCheck" />
+
+                                <ImageView
+                                    android:id="@+id/lockedicon"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center_vertical"
+                                    android:alpha="0.8"
+                                    android:scaleX="0.8"
+                                    android:scaleY="0.8"
+                                    app:srcCompat="@drawable/lock" />
+
+                                <ImageView
+                                    android:id="@+id/lockedicon2"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center_vertical"
+                                    android:alpha="0.8"
+                                    android:scaleX="0.8"
+                                    android:scaleY="0.8"
+                                    app:srcCompat="@drawable/next" />
+
+                            </LinearLayout>
 
                         </LinearLayout>
 
@@ -295,9 +357,7 @@
                         android:layout_marginTop="24dp"
                         android:layout_marginEnd="16dp"
                         android:orientation="vertical"
-                        android:paddingBottom="16dp">
-
-                    </LinearLayout>
+                        android:paddingBottom="16dp"/>
 
                 </LinearLayout>
             </ScrollView>

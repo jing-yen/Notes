@@ -12,7 +12,6 @@ import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.StrikethroughSpan
 import android.text.style.UnderlineSpan
-import androidx.transition.TransitionManager
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
@@ -20,9 +19,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 import androidx.core.text.clearSpans
 import androidx.lifecycle.MutableLiveData
 import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -30,11 +32,12 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.jingyen.notes.databinding.ActivityNotesBinding
 import kotlinx.coroutines.*
-import kotlinx.datetime.Clock
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.*
+import java.util.concurrent.Executor
 
 class NotesActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNotesBinding
@@ -50,7 +53,7 @@ class NotesActivity : AppCompatActivity() {
     private var materialADTheme = R.style.YellowMaterialAlertDialog
 
     private var id = 0
-    private var note = DecodedNote(0, Meta(1, Clock.System.now().toEpochMilliseconds(), Clock.System.now().toEpochMilliseconds(), 1, false), "", "", emptyList())
+    private var note = DecodedNote(0, Meta(), "", "", emptyList())
     private var color = MutableLiveData(1)
     private var selectingAlarm = MutableLiveData(true)
     var textstyle = MutableLiveData(TextStyle(bold = false, italic = false, underline = false, strikethrough = false, list = false))
@@ -71,7 +74,6 @@ class NotesActivity : AppCompatActivity() {
                 (binding.text.text as Spannable).setSpan(when (span.spanType) {
                     1 -> BoldSpan(); 2 -> ItalicSpan(); 3 -> RealUnderlineSpan(); 4 -> StrikethroughSpan(); else -> ListSpan(15, 25) },
                     span.start, span.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE) }
-            if (note.meta.protection) Toast.makeText(applicationContext, "You should not open this note. It's protected.", Toast.LENGTH_SHORT).show()
             changeOptionsStatus(note.meta.protection)
         } } else {
             showKeyboard = true
@@ -86,7 +88,7 @@ class NotesActivity : AppCompatActivity() {
                     BottomSheetBehavior.STATE_EXPANDED -> {
                         binding.wordcount.text = getString(R.string.words, WordCounter.countWords(
                             binding.text.text!!.toString()
-                        ))
+                        )) + if (note.meta.protection) ", locked" else ", not locked"
                     }
                     //BottomSheetBehavior.STATE_COLLAPSED ->
                     //BottomSheetBehavior.STATE_DRAGGING ->
@@ -135,10 +137,7 @@ class NotesActivity : AppCompatActivity() {
 
             // Options bottom sheet actions
             binding.optionsBottomSheet.setOnClickListener {  }
-            binding.actionlock.setOnClickListener {
-                note.meta.protection = !note.meta.protection
-                changeOptionsStatus(note.meta.protection)
-            }
+            binding.actionlock.setOnClickListener { tryLock(note.meta.protection) }
             binding.actionreminder.setOnClickListener {
                 TransitionManager.beginDelayedTransition(binding.optionsBottomSheet, AutoTransition().setDuration(100))
                 binding.actions.visibility = View.GONE
@@ -405,6 +404,37 @@ class NotesActivity : AppCompatActivity() {
     private fun changeOptionsStatus(locked: Boolean) {
         binding.actionlockIv.setImageResource(if (locked) R.drawable.unlock else R.drawable.lock)
         binding.actionlockTv.text = if (locked) getString(R.string.unlock) else getString(R.string.lock)
+        binding.wordcount.text = getString(R.string.words, WordCounter.countWords(
+        binding.text.text!!.toString()
+        )) + if (note.meta.protection) ", locked" else ", not locked"
+    }
+
+    private fun tryLock(locked: Boolean) {
+        val text = if (locked) "Unlock this note" else "Lock this note"
+        lateinit var biometricPrompt: BiometricPrompt
+        val executor: Executor = ContextCompat.getMainExecutor(this)
+        biometricPrompt = BiometricPrompt(this, executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
+                    Toast.makeText(applicationContext, "Authentication error: $errString", Toast.LENGTH_SHORT).show()
+                }
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+                    note.meta.protection = !note.meta.protection
+                    changeOptionsStatus(note.meta.protection)
+                }
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    Toast.makeText(applicationContext, "Authentication failed", Toast.LENGTH_SHORT).show()
+                }
+            })
+        val promptInfo: BiometricPrompt.PromptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle(text)
+            .setSubtitle("Log in with your biometrics")
+            .setNegativeButtonText("Use PIN")
+            .build()
+        biometricPrompt.authenticate(promptInfo)
     }
 
     private fun hideKeyboard(): Boolean {
@@ -451,8 +481,8 @@ class NotesActivity : AppCompatActivity() {
                 val type = when (span) { is BoldSpan -> 1; is ItalicSpan -> 2; is RealUnderlineSpan -> 3; is StrikethroughSpan -> 4; is ListSpan -> 5; else -> 0 }
                 if (type!=0) spansData.add(SpanData(type, spannable.getSpanStart(span), spannable.getSpanEnd(span)))
             }
-            Backend.insert(id, Meta(1, Clock.System.now().toEpochMilliseconds(), note.meta.createdTime, color.value!!, note.meta.protection), binding.title.text.toString(), binding.text.text.toString(), spansData)
-        } else Backend.delete(id)
+            Backend.insert(id, Meta(Instant.now().toEpochMilli(), note.meta.createdTime, color.value!!, note.meta.protection), binding.title.text.toString(), binding.text.text.toString(), spansData, applicationContext)
+        } else Backend.delete(id, applicationContext)
     }
 
     open inner class CustomTextWatcher: TextWatcher {

@@ -13,6 +13,7 @@ import kotlinx.serialization.json.Json
 import android.icu.text.BreakIterator
 import android.os.Build
 import androidx.annotation.RequiresApi
+import java.time.Instant
 import kotlin.collections.HashMap
 
 data class TextStyle(
@@ -36,7 +37,13 @@ data class FastDecodedNote(
     var text: String)
 
 @kotlinx.serialization.Serializable
-data class Meta(var appVersion: Int, var modifiedTime: Long, var createdTime: Long, val color: Int, var protection: Boolean)
+data class Meta(
+    var modifiedTime: Long = Instant.now().toEpochMilli(),
+    var createdTime: Long = Instant.now().toEpochMilli(),
+    val color: Int = 1,
+    var protection: Boolean = false,
+    var appVersion: Int = BuildConfig.VERSION_CODE,
+    var minVersion: Int = 1)
 
 @kotlinx.serialization.Serializable
 data class SpanData(var spanType: Int, var start: Int, var end: Int)
@@ -70,7 +77,8 @@ object Backend {
         return DecodedNote(note.id, Json.decodeFromString(note.meta), note.title, note.text, Json.decodeFromString(note.spansData))
     }
 
-    fun insert(id: Int, meta: Meta, title: String, text: String, spansData: List<SpanData>) {
+    fun insert(id: Int, meta: Meta, title: String, text: String, spansData: List<SpanData>, applicationContext: Context) {
+        init(applicationContext)
         scope.launch {
             withContext(NonCancellable) {
                 notesQueries.insert(id, Json.encodeToString(meta), title, text, Json.encodeToString(spansData))
@@ -83,7 +91,8 @@ object Backend {
         return try { notesQueries.highestId().executeAsOne()+1 } catch (ex: NullPointerException) { 1 }
     }
 
-    fun delete(id: Int) {
+    fun delete(id: Int, applicationContext: Context) {
+        init(applicationContext)
         scope.launch { withContext(NonCancellable) { notesQueries.delete(id) } }
     }
 }

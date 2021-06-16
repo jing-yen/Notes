@@ -1,5 +1,6 @@
 package com.jingyen.notes
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -32,6 +33,15 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlin.math.sqrt
+import android.content.DialogInterface
+import android.net.Uri
+import androidx.appcompat.app.AlertDialog
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.concurrent.Executor
+
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "SETTINGS")
 
@@ -45,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         get() = (this * Resources.getSystem().displayMetrics.density).toInt()
 
     private var sortBy = 0
+    private var unlocked = false
     private var password = ""
     private var notes: MutableList<FastDecodedNote> = mutableListOf()
 
@@ -101,8 +112,9 @@ class MainActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 binding.entries.removeAllViews()
-                if (start + count > 0) notes.forEach { note -> if (note.title.contains(s!!, ignoreCase = true) || note.text.contains(s, ignoreCase = true)) addEntry(note) }
-                else for (note in notes) addEntry(note)
+                if (start + count > 0) notes.forEach { note ->
+                    if ((note.title.contains(s!!, ignoreCase = true) || note.text.contains(s, ignoreCase = true)) && note.meta.protection==unlocked) addEntry(note) }
+                else for (note in notes.filter { if (unlocked) it.meta.protection else !it.meta.protection }) addEntry(note)
             }
         })
 
@@ -132,11 +144,12 @@ class MainActivity : AppCompatActivity() {
             0 -> R.color.redPreview
             1 -> R.color.yellowPreview
             2 -> R.color.greenPreview
-            3 ->  R.color.bluePreview
-            4 ->  R.color.purplePreview
-            else ->  R.color.greyPreview }
+            3 -> R.color.bluePreview
+            4 -> R.color.purplePreview
+            else -> R.color.greyPreview }
 
         val title = AppCompatTextView(this)
+        title.isEmojiCompatEnabled = true
         title.text = note.title
         title.typeface = typefaceBold
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
@@ -161,12 +174,12 @@ class MainActivity : AppCompatActivity() {
         val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         layoutParams.setMargins(0, 0, 0, 10.toPx)
         entry.layoutParams = layoutParams
-        entry.setOnClickListener { goToNotes(note.id) }
+        entry.setOnClickListener { goToNotes(note.id, note.meta.minVersion) }
         binding.entries.addView(entry)
     }
 
     fun newEntry(v: View) {
-        goToNotes(-1)
+        goToNotes(-1, BuildConfig.VERSION_CODE)
     }
 
     fun stopSearch(v: View) {
@@ -184,7 +197,7 @@ class MainActivity : AppCompatActivity() {
             1 -> notes.sortByDescending { it.meta.createdTime }
             else -> notes.sortBy { it.meta.color }
         }
-        for (note in notes) addEntry(note)
+        for (note in notes.filter { if (unlocked) it.meta.protection else !it.meta.protection }) addEntry(note)
         binding.sortModifiedTime.background = null
         binding.sortCreatedTime.background = null
         binding.sortColor.background = null
@@ -198,7 +211,7 @@ class MainActivity : AppCompatActivity() {
         binding.entries.animate()
             .translationY(-binding.sortButtons.height.toFloat())
             .duration = 100
-        binding.sortText.text = getString(R.string.sortText, when (sortBy) { 0 -> getString(R.string.modifiedTime); 1 -> getString(R.string.createdTime); else -> getString(R.string.colour) })
+        binding.sortText.text = when (sortBy) { 0 -> getString(R.string.modifiedTime); 1 -> getString(R.string.createdTime); else -> getString(R.string.colour) }
     }
 
     fun showSort(v: View) {
@@ -216,10 +229,86 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun goToNotes(id: Int) {
-        val intent = Intent(this, NotesActivity::class.java)
-        if (id > 0L) intent.putExtra("id", id)
-        startActivity(intent)
+    private fun goToNotes(id: Int, minVersion: Int) {
+        if (minVersion <= BuildConfig.VERSION_CODE) {
+            val intent = Intent(this, NotesActivity::class.java)
+            if (id > 0) intent.putExtra("id", id)
+            startActivity(intent)
+        } else {
+            MaterialAlertDialogBuilder(this, R.style.GreyMaterialAlertDialog)
+                .setTitle("Note is from newer version")
+                .setMessage("This note was created from a newer version of the app. You won't be able to open it unless you update this app. Update now?")
+                .setPositiveButton("Continue") { dialog, which ->
+                    try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName"))) }
+                    catch (e: ActivityNotFoundException) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName"))) }
+                }
+                .setNegativeButton("Not Now", null)
+                .show()
+        }
+    }
+
+    fun unlock(v: View) {
+        if (unlocked) {
+            unlocked = false
+            binding.title.animate()
+                .alpha(0f)
+                .setDuration(100L)
+                .withEndAction {
+                    binding.title.text = getString(R.string.app_title)
+                    binding.title.animate().alpha(1f).duration = 100L
+                }
+            binding.lockedicon2.visibility = View.VISIBLE
+            binding.exittext.visibility = View.GONE
+            binding.lockedicon.setImageDrawable(resources.getDrawable(R.drawable.lock, this.theme))
+            binding.entries.animate()
+                .alpha(0f)
+                .setDuration(100L)
+                .withEndAction {
+                    sort(when (sortBy) { 0 -> binding.sortModifiedTime; 1 -> binding.sortCreatedTime; else -> binding.sortColor})
+                    binding.entries.animate().alpha(1f).duration = 100L
+                }
+        } else {
+            lateinit var biometricPrompt: BiometricPrompt
+            val executor: Executor = ContextCompat.getMainExecutor(this)
+            biometricPrompt = BiometricPrompt(this, executor,
+                object : BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                        super.onAuthenticationError(errorCode, errString)
+                        Toast.makeText(applicationContext, "Authentication error: $errString", Toast.LENGTH_SHORT).show()
+                    }
+                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                        super.onAuthenticationSucceeded(result)
+                        unlocked = true
+                        binding.title.animate()
+                            .alpha(0f)
+                            .setDuration(100L)
+                            .withEndAction {
+                                binding.title.text = "Locked Notes \uD83D\uDD12"
+                                binding.title.animate().alpha(1f).duration = 100L
+                            }
+                        binding.lockedicon2.visibility = View.GONE
+                        binding.exittext.visibility = View.VISIBLE
+                        binding.lockedicon.setImageDrawable(resources.getDrawable(R.drawable.logout, this@MainActivity.theme))
+                        binding.entries.animate()
+                            .alpha(0f)
+                            .setDuration(100L)
+                            .withEndAction {
+                                sort(when (sortBy) { 0 -> binding.sortModifiedTime; 1 -> binding.sortCreatedTime; else -> binding.sortColor})
+                                binding.entries.animate().alpha(1f).duration = 100L
+                            }
+                    }
+                    override fun onAuthenticationFailed() {
+                        super.onAuthenticationFailed()
+                        Toast.makeText(applicationContext, "Authentication failed", Toast.LENGTH_SHORT).show()
+                    }
+                })
+            val promptInfo: BiometricPrompt.PromptInfo = BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Access locked notes")
+                .setSubtitle("Log in with your biometrics")
+                .setNegativeButtonText("Use PIN")
+                .build()
+            biometricPrompt.authenticate(promptInfo)
+        }
     }
 
     override fun onBackPressed() {
