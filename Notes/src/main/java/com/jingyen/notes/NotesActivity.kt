@@ -88,7 +88,7 @@ class NotesActivity : AppCompatActivity() {
                     BottomSheetBehavior.STATE_EXPANDED -> {
                         binding.wordcount.text = getString(R.string.words, WordCounter.countWords(
                             binding.text.text!!.toString()
-                        )) + if (note.meta.protection) ", locked" else ", not locked"
+                        )) //+ if (note.meta.protection) ", locked" else ", not locked"
                     }
                     //BottomSheetBehavior.STATE_COLLAPSED ->
                     //BottomSheetBehavior.STATE_DRAGGING ->

@@ -39,6 +39,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.concurrent.Executor
 
@@ -101,7 +102,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 binding.head.visibility = View.VISIBLE
                 binding.title.visibility = View.VISIBLE
-                binding.sort.visibility = View.VISIBLE
+                binding.sort.visibility = if (notes.isEmpty()) View.GONE else View.VISIBLE
                 binding.entries.translationY = -binding.sortButtons.height.toFloat()
                 binding.back.visibility = View.GONE
             }
@@ -122,6 +123,8 @@ class MainActivity : AppCompatActivity() {
         binding.root.post {
             CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
                 Backend.mutableNotes.collect { mutableNotesValue ->
+                    binding.nonotesalarm.visibility = if (mutableNotesValue.isEmpty()) View.VISIBLE else View.GONE
+                    binding.sort.visibility = if (mutableNotesValue.isNotEmpty()) View.VISIBLE else View.GONE
                     notes = mutableNotesValue.toMutableList()
                     sort(when (sortBy) { 0 -> binding.sortModifiedTime; 1 -> binding.sortCreatedTime; else -> binding.sortColor})
                 }
@@ -135,7 +138,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        sensorManager?.registerListener(sensorListener, sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL)
+        //sensorManager?.registerListener(sensorListener, sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL)
         super.onResume()
     }
 
@@ -318,7 +321,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        sensorManager?.unregisterListener(sensorListener)
+        //sensorManager?.unregisterListener(sensorListener)
         super.onPause()
     }
 
@@ -352,7 +355,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onShake() {
-        sensorManager?.unregisterListener(sensorListener)
+        //sensorManager?.unregisterListener(sensorListener)
         Toast.makeText(this, "Shake to create!", Toast.LENGTH_SHORT).show()
         newEntry(binding.avd)
     }

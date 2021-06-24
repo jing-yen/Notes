@@ -280,6 +280,7 @@
                 android:paddingTop="8dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="8dp"
+                android:visibility="gone"
                 app:srcCompat="@drawable/list"
                 tools:ignore="SpeakableTextPresentCheck" />
 
@@ -372,7 +373,8 @@
                         android:layout_weight="1"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingEnd="16dp">
+                        android:paddingEnd="16dp"
+                        android:visibility="gone">
 
                         <ImageView
                             android:id="@+id/actionlock_iv"

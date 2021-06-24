@@ -38,10 +38,38 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/add"
                 tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck,DuplicateSpeakableTextCheck" />
+
+            <ImageView
+                android:id="@+id/avd2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:contentDescription="TODO"
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/earlyaccess"
+                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck,DuplicateSpeakableTextCheck" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/regular"
+                android:text="@string/early_access"
+                android:textColor="@color/lightText"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/avd2"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/color"
@@ -93,7 +121,7 @@
                     <TextView
                         android:id="@+id/title"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="48dp"
                         android:layout_marginEnd="16dp"
@@ -221,6 +249,7 @@
                                 android:onClick="unlock"
                                 android:orientation="horizontal"
                                 android:paddingEnd="8dp"
+                                android:visibility="gone"
                                 tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck">
 
                                 <View
@@ -358,6 +387,19 @@
                         android:layout_marginEnd="16dp"
                         android:orientation="vertical"
                         android:paddingBottom="16dp"/>
+
+                    <TextView
+                        android:id="@+id/nonotesalarm"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="32dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/regular"
+                        android:text="@string/no_notes"
+                        android:textAlignment="center"
+                        android:textColor="@color/lightText" />
 
                 </LinearLayout>
             </ScrollView>

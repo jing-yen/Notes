@@ -81,7 +81,7 @@ object Backend {
         init(applicationContext)
         scope.launch {
             withContext(NonCancellable) {
-                notesQueries.insert(id, Json.encodeToString(meta), title, text, Json.encodeToString(spansData))
+                notesQueries.insert(id, Json.encodeToString(meta), title, text, Json.encodeToString(spansData), "", "")
             }
         }
     }

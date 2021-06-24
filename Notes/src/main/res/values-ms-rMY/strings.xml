@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Catatan</string>
+    <string name="app_title">Catatan</string>
+    <string name="search">Cari ...</string>
+    <string name="sortText">Susun mengikut: %1$s</string>
+    <string name="modifiedTime">Masa Pengubahsuaian</string>
+    <string name="createdTime">Masa Penciptaan</string>
+    <string name="colour">Warna</string>
+    <string name="hintTitle">Tajuk</string>
+    <string name="hintText">Mula bertaip...</string>
+    <string name="remindTip">Ciptakan penggera atau peringatan</string>
+    <string name="colourTip">Ubah warna catatan</string>
+    <string name="optionsTip">Pilihan-pilihan lain</string>
+    <string name="words">%1$d patah perkataan</string>
+    <string name="lock">Sulitkan</string>
+    <string name="unlock">Nyahsulitkan</string>
+    <string name="remind">Penggera atau peringatan</string>
+    <string name="share">Kongsikan</string>
+    <string name="delete">Padamkan</string>
+    <string name="alarm">Penggera</string>
+    <string name="reminder">Peringatan</string>
+    <string name="sundayshort">A</string>
+    <string name="mondayshort">I</string>
+    <string name="tuesdayshort">S</string>
+    <string name="wednesdayshort">R</string>
+    <string name="thursdayshort">K</string>
+    <string name="fridayshort">J</string>
+    <string name="saturdayshort">S</string>
+    <string name="select">Pilihkan catatan</string>
+    <string name="no_notes">Kamu tidak ada sebarang catatan  :(</string>
+    <string name="early_access">Akses Awal</string>
+</resources>

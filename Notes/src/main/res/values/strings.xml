@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Notes</string>
+    <string name="app_name">Quick Notes</string>
     <string name="app_title">Quick Notes</string>
     <string name="search">Search ...</string>
     <string name="sortText">Sort by: %1$s</string>
@@ -18,7 +18,6 @@
     <string name="unlock">Unlock</string>
     <string name="remind">Remind or alarm</string>
     <string name="share">Share</string>
-    <string name="homescreen">Place on home screen</string>
     <string name="delete">Delete</string>
     <!-- Options bottom sheet: Setting alarm/reminder -->
     <string name="alarm">Alarm</string>
@@ -32,4 +31,6 @@
     <string name="saturdayshort">S</string>
     <!--WidgetConfigurationActivity.kt-->
     <string name="select">Select Note</string>
+    <string name="no_notes">You have no notes :(</string>
+    <string name="early_access">Early Access</string>
 </resources>

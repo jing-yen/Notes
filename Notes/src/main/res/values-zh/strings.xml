@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">便笺</string>
+    <string name="app_name">简易便笺</string>
     <string name="app_title">简易便笺</string>
     <string name="search">搜索 ...</string>
     <string name="hintTitle">标题</string>
@@ -8,7 +8,6 @@
     <string name="lock">封锁</string>
     <string name="unlock">解锁</string>
     <string name="share">分享</string>
-    <string name="homescreen">放到主屏上</string>
     <string name="delete">删除</string>
     <string name="optionsTip">更多选择</string>
     <string name="colourTip">更换颜色</string>
@@ -27,13 +26,8 @@
     <string name="thursdayshort">四</string>
     <string name="fridayshort">五</string>
     <string name="saturdayshort">六</string>
-    <string name="sundayshortu"><u>日</u></string>
-    <string name="mondayshortu"><u>一</u></string>
-    <string name="tuesdayshortu"><u>二</u></string>
-    <string name="wednesdayshortu"><u>三</u></string>
-    <string name="thursdayshortu"><u>四</u></string>
-    <string name="fridayshortu"><u>五</u></string>
-    <string name="saturdayshortu"><u>六</u></string>
     <string name="alarm">闹钟</string>
     <string name="reminder">提醒</string>
+    <string name="no_notes">你没有任何便笺 :(</string>
+    <string name="early_access">抢先体验</string>
 </resources>

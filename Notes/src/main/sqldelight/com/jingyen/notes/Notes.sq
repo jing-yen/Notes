@@ -1,14 +1,18 @@
+
+
 CREATE TABLE Note (
     id INTEGER AS Int NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT,
     meta TEXT NOT NULL,
     title TEXT NOT NULL,
     text TEXT NOT NULL,
-    spansData TEXT NOT NULL
+    spansData TEXT NOT NULL,
+    tags TEXT NOT NULL,
+    media TEXT NOT NULL
 );
 
 insert:
-INSERT OR REPLACE INTO Note(id, meta, title, text, spansData)
-VALUES (?, ?, ? ,?, ?);
+INSERT OR REPLACE INTO Note(id, meta, title, text, spansData, tags, media)
+VALUES (?, ?, ? , ?, ?, ?, ?);
 
 highestId:
 SELECT id FROM Note ORDER BY id DESC LIMIT 1;
