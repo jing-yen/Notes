@@ -4,13 +4,11 @@ import android.app.Application
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.text.Layout
+import android.text.style.LeadingMarginSpan
 import android.text.style.StyleSpan
 import android.text.style.UnderlineSpan
-import android.text.style.LeadingMarginSpan
-import androidx.core.provider.FontRequest
-import androidx.emoji2.text.DefaultEmojiCompatConfig
+import androidx.emoji2.bundled.BundledEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
-import androidx.emoji2.text.FontRequestEmojiCompatConfig
 
 class BoldSpan: StyleSpan(1)
 
@@ -34,6 +32,6 @@ class ListSpan(private val leadWidth: Int, private val gapWidth: Int) : LeadingM
 class EmojiInit: Application() {
     override fun onCreate() {
         super.onCreate()
-        EmojiCompat.init(DefaultEmojiCompatConfig.create(this)!!.setReplaceAll(true))
+        EmojiCompat.init(BundledEmojiCompatConfig(applicationContext).setReplaceAll(true))
     }
 }
