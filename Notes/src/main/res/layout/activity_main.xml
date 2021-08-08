@@ -249,7 +249,6 @@
                                 android:onClick="unlock"
                                 android:orientation="horizontal"
                                 android:paddingEnd="8dp"
-                                android:visibility="gone"
                                 tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck">
 
                                 <View
@@ -265,7 +264,7 @@
                                     android:fontFamily="@font/regular"
                                     android:gravity="center_vertical"
                                     android:paddingEnd="8dp"
-                                    android:text="Exit"
+                                    android:text="@string/back"
                                     android:textAlignment="center"
                                     android:textColor="@color/lightText"
                                     android:textSize="14sp"

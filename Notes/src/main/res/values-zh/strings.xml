@@ -30,4 +30,12 @@
     <string name="reminder">提醒</string>
     <string name="no_notes">你没有任何便笺 :(</string>
     <string name="early_access">抢先体验</string>
+    <string name="back">返回</string>
+    <string name="locked">已鎖</string>
+    <string name="notlocked">沒鎖</string>
+    <string name="lockthisnote">封锁这笔记</string>
+    <string name="unlockthisnote">解锁这笔记</string>
+    <string name="loginwithyourbiometrics">用指纹登入</string>
+    <string name="accesslockednotes">打开已封锁笔记</string>
+    <string name="lockednotes">被封锁笔记</string>
 </resources>

@@ -30,4 +30,12 @@
     <string name="select">Pilihkan catatan</string>
     <string name="no_notes">Kamu tidak ada sebarang catatan  :(</string>
     <string name="early_access">Akses Awal</string>
+    <string name="back">Kembali</string>
+    <string name="locked">disulitkan</string>
+    <string name="notlocked">tidak disulitkan</string>
+    <string name="unlockthisnote">Nyahsulit catatan ini</string>
+    <string name="lockthisnote">Sulitkan catatan ini</string>
+    <string name="loginwithyourbiometrics">Log masuk dengan biometrik anda</string>
+    <string name="accesslockednotes">Akses catatan yang disulitkan</string>
+    <string name="lockednotes">Catatan Sulit</string>
 </resources>

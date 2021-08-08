@@ -33,4 +33,12 @@
     <string name="select">Select Note</string>
     <string name="no_notes">You have no notes :(</string>
     <string name="early_access">Early Access</string>
+    <string name="back">Back</string>
+    <string name="locked">locked</string>
+    <string name="notlocked">not locked</string>
+    <string name="unlockthisnote">Unlock this note</string>
+    <string name="lockthisnote">Lock this note</string>
+    <string name="loginwithyourbiometrics">Log in with your biometrics</string>
+    <string name="accesslockednotes">Access locked notes</string>
+    <string name="lockednotes">Locked Notes</string>
 </resources>

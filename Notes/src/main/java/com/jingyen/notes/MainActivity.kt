@@ -277,7 +277,7 @@ class MainActivity : AppCompatActivity() {
                 object : BiometricPrompt.AuthenticationCallback() {
                     override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                         super.onAuthenticationError(errorCode, errString)
-                        Toast.makeText(applicationContext, "Authentication error: $errString", Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(applicationContext, "Authentication error: $errString", Toast.LENGTH_SHORT).show()
                     }
                     override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                         super.onAuthenticationSucceeded(result)
@@ -286,7 +286,7 @@ class MainActivity : AppCompatActivity() {
                             .alpha(0f)
                             .setDuration(100L)
                             .withEndAction {
-                                binding.title.text = "Locked Notes \uD83D\uDD12"
+                                binding.title.text = getString(R.string.lockednotes)+" \uD83D\uDD12"
                                 binding.title.animate().alpha(1f).duration = 100L
                             }
                         binding.lockedicon2.visibility = View.GONE
@@ -306,9 +306,9 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
             val promptInfo: BiometricPrompt.PromptInfo = BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Access locked notes")
-                .setSubtitle("Log in with your biometrics")
-                .setNegativeButtonText("Use PIN")
+                .setTitle(getString(R.string.accesslockednotes))
+                .setSubtitle(getString(R.string.loginwithyourbiometrics))
+                .setNegativeButtonText(getString(R.string.back))
                 .build()
             biometricPrompt.authenticate(promptInfo)
         }

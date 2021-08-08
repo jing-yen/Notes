@@ -88,7 +88,8 @@ class NotesActivity : AppCompatActivity() {
                     BottomSheetBehavior.STATE_EXPANDED -> {
                         binding.wordcount.text = getString(R.string.words, WordCounter.countWords(
                             binding.text.text!!.toString()
-                        )) //+ if (note.meta.protection) ", locked" else ", not locked"
+                        )) + if (note.meta.protection) ", "+getString(R.string.locked) else ""
+
                     }
                     //BottomSheetBehavior.STATE_COLLAPSED ->
                     //BottomSheetBehavior.STATE_DRAGGING ->
@@ -406,18 +407,18 @@ class NotesActivity : AppCompatActivity() {
         binding.actionlockTv.text = if (locked) getString(R.string.unlock) else getString(R.string.lock)
         binding.wordcount.text = getString(R.string.words, WordCounter.countWords(
         binding.text.text!!.toString()
-        )) + if (note.meta.protection) ", locked" else ", not locked"
+        ))  + if (note.meta.protection) ", "+getString(R.string.locked) else ""
     }
 
     private fun tryLock(locked: Boolean) {
-        val text = if (locked) "Unlock this note" else "Lock this note"
+        val text = if (locked) getString(R.string.unlockthisnote) else getString(R.string.lockthisnote)
         lateinit var biometricPrompt: BiometricPrompt
         val executor: Executor = ContextCompat.getMainExecutor(this)
         biometricPrompt = BiometricPrompt(this, executor,
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
-                    Toast.makeText(applicationContext, "Authentication error: $errString", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(applicationContext, "Authentication error: $errString", Toast.LENGTH_SHORT).show()
                 }
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
@@ -431,8 +432,8 @@ class NotesActivity : AppCompatActivity() {
             })
         val promptInfo: BiometricPrompt.PromptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(text)
-            .setSubtitle("Log in with your biometrics")
-            .setNegativeButtonText("Use PIN")
+            .setSubtitle(getString(R.string.loginwithyourbiometrics))
+            .setNegativeButtonText(getString(R.string.back))
             .build()
         biometricPrompt.authenticate(promptInfo)
     }

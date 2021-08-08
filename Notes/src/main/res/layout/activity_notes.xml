@@ -373,8 +373,7 @@
                         android:layout_weight="1"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingEnd="16dp"
-                        android:visibility="gone">
+                        android:paddingEnd="16dp">
 
                         <ImageView
                             android:id="@+id/actionlock_iv"
